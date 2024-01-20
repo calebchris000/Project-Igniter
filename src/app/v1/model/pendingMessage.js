@@ -14,14 +14,14 @@ const PendingMessage = sequelize.define("PendingMessage", {
   senderId: {
     type: DataTypes.UUID,
     references: {
-      model: "Users",
+      model: "accounts",
       key: "id",
     },
   },
   receiverId: {
     type: DataTypes.UUID,
     references: {
-      model: "Users",
+      model: "accounts",
       key: "id",
     },
   },

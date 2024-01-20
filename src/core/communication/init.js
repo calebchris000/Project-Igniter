@@ -12,8 +12,7 @@ module.exports = async function (server) {
     try {
       const query = url.parse(req.url, true).query;
       const clientId = query.clientId;
-      console.log("CLLIEENNTT IDDDD", clientId);
-      clients.set(clientId, ws);
+      if (clientId) clients.set(clientId, ws);
 
       const pendingMessages = await PendingMessage.findAll({
         where: { receiverId: clientId },
@@ -22,6 +21,7 @@ module.exports = async function (server) {
       console.log(pendingMessages.length, "HERRR");
       if (pendingMessages.length) {
         ws.send(`${JSON.stringify(pendingMessages)}`);
+        await PendingMessage.destroy({ where: { receiverId: clientId } });
       }
       console.log(`WebSocket client (${clientId}) is connected`);
 

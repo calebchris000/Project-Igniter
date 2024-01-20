@@ -8,7 +8,6 @@ const GetMessages = async (req, res) => {
     const { senderId, receiverId } = req.params;
 
     const Messages = await Message.findAll({ where: { senderId, receiverId } });
-    console.log("me");
     return HttpResponse(res, 200, "Messages fetched successfully", Messages);
   } catch (error) {
     return HttpResponse(res, 500, error.toString());
@@ -27,7 +26,10 @@ const SendMessage = async (req, res) => {
       status: "sent",
     });
 
-    websocket.send(JSON.stringify({ receiverId, content }));
+    websocket.on("open", () => {
+      websocket.send(JSON.stringify({ receiverId, content }));
+    });
+
     return HttpResponse(res, 201, "Message successfully sent", newMessage);
   } catch (error) {
     return HttpResponse(res, 500, error.toString());

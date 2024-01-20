@@ -22,6 +22,24 @@ const verifyID = async (req, res, next) => {
       next();
     }
 
+    if (senderId) {
+      const senderAccount = await Account.findOne({ where: { id: senderId } });
+      if (!senderAccount) {
+        return HttpResponse(res, 400, "Sender account does not exist");
+      }
+      next();
+    }
+
+    if (receiverId) {
+      const senderAccount = await Account.findOne({
+        where: { id: receiverId },
+      });
+      if (!senderAccount) {
+        return HttpResponse(res, 400, "Receiver account does not exist");
+      }
+      next();
+    }
+
     if (accountId) {
       const userAccount = await Account.findOne({ where: { id: accountId } });
 

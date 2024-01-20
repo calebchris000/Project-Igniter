@@ -63,15 +63,19 @@ const SavePendingMessage = async (req, res) => {
 const DeletePendingMessages = async (req, res) => {
   try {
     const { receiverId } = req.params;
+    console.log("HAHAHAHA", receiverId)
 
-    const receiver = await Account.findOne({ id: receiverId });
-
-    await PendingMessage.destroy({ where: { id: receiverId } });
+    const receiver = await Account.findOne({ where: { id: receiverId } });
+    if (!receiver) {
+      return HttpResponse(res, 404, "receiver does not exist");
+    }
+    const deleted = await PendingMessage.destroy({ where: { id: receiverId } });
 
     return HttpResponse(
       res,
       200,
-      `All pending messages for recipient ${receiver.userName} are removed`
+      `All pending messages for recipient ${receiver.userName} are removed`,
+      deleted
     );
   } catch (error) {
     return HttpResponse(res, 500, error.toString());

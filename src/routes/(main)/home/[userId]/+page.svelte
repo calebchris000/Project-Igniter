@@ -1,18 +1,51 @@
 <script>
   import UserNav from "../../../../lib/top/user-chat/index.svelte";
   import image from "../../../../lib/images/man2.png";
+  import { appendChat } from "../../../../core/utils/index";
+  import "./style.css";
   /** @type {import('./$types').PageData} */
   export let data;
 
-  function resizeInput(input) {
+  let textArea;
+  let text_input = "";
+  let chatBody;
+
+  function resizeInput(e) {
+    const input = e.target;
     if (!input.value) {
       input.style.height = "3.5rem";
       return;
     }
+
     input.style.height = `${input.scrollHeight}px`;
   }
 
-  let text_input = "";
+  let shift = false;
+  function handleInput(input) {
+    if (input.key === "Shift") {
+      shift = true;
+      return;
+    }
+    if (input.key !== "Enter") {
+      shift = false;
+    }
+    if (shift && input.key === "Enter") {
+      shift = false;
+      console.log("shift + enter");
+      return;
+    }
+
+    if (input.key === "Enter") {
+      input.preventDefault();
+      input.target.style.height = "3.5rem";
+
+      if (chatBody.scrollHeight > chatBody.clientHeight) {
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }
+      appendChat(chatBody, text_input, "you");
+      text_input = "";
+    }
+  }
 </script>
 
 <section class="">
@@ -20,16 +53,25 @@
     <UserNav {image} name="Mark Spencer" is_active={true} />
   </div>
 
-  <div class="chat-body"></div>
+  <div
+    bind:this={chatBody}
+    class="chat-body overflow-y-auto my-4 mb-10 relative flex flex-col gap-2 py-16"
+  >
+    <p class="you">Hello</p>
+    <p class="recipient">Hi</p>
+    <p class="you">How u doing?</p>
+  </div>
 
   <div
     class=" absolute bg-gray-500 h-32 px-5 flex items-center gap-5 bottom-0 rounded-md left-0 right-0"
   >
     <textarea
       bind:value={text_input}
-      on:input={(e) => resizeInput(e.target)}
+      bind:this={textArea}
+      on:input={(e) => resizeInput(e)}
+      on:keydown={(e) => handleInput(e)}
       placeholder="Message"
-      class=" bg-gray-300 overflow-auto placeholder:text-gray-600 resize-none w-full h-14 rounded-xl py-4 outline-none px-3"
+      class=" bg-gray-300 max-h-28 overflow-y-hidden overflow-auto placeholder:text-gray-600 resize-none w-full h-14 rounded-xl py-4 outline-none px-3"
       type="text"
       name=""
       id=""
@@ -37,6 +79,18 @@
     <div>
       {#if text_input.trim().length}
         <svg
+          role="button"
+          on:keydown={() => {
+            appendChat(chatBody, text_input, "you");
+            textArea.style.height = "3.5rem";
+            text_input = "";
+          }}
+          on:click={() => {
+            appendChat(chatBody, text_input, "you");
+            text_input = "";
+            textArea.style.height = "3.5rem";
+          }}
+          tabindex={2}
           class="cursor-pointer text-5xl text-black border border-white rounded-full bg-white p-2"
           xmlns="http://www.w3.org/2000/svg"
           width="1em"

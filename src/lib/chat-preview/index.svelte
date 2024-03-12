@@ -1,13 +1,18 @@
 <script>
   import moment from "moment";
+  import { goto } from "$app/navigation";
   export let image = "";
   export let name = "User";
+  export let id = "123";
   export let preview = "";
   export let read = true;
   export let message_time = moment().subtract("30", "minutes").format("HH:mm");
 </script>
 
 <section
+  on:keydown={() => goto(`/home/${id}`)}
+  on:click={() => goto(`/home/${id}`)}
+  tabindex={1}
   class="flex items-center gap-4 cursor-pointer hover:bg-gray-100 py-2 rounded-md transition-all duration-75"
   role="button"
 >

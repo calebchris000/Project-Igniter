@@ -1,4 +1,6 @@
 <script>
+  import { goto } from "$app/navigation";
+
   export let image = "";
   export let name = "User";
   export let is_active = false;
@@ -15,7 +17,7 @@
       {is_active ? "Active Now" : last_active}
     </p>
   </div>
-  <button class="ms-auto bg-transparent">
+  <button on:click={() => goto("/home")} class="ms-auto bg-transparent">
     <svg
       class="text-4xl"
       xmlns="http://www.w3.org/2000/svg"

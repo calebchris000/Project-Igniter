@@ -1,4 +1,5 @@
 <script>
+  import { socket } from "./../../../../core/chat-core/index.js";
   import UserNav from "../../../../lib/top/user-chat/index.svelte";
   import image from "../../../../lib/images/man2.png";
   import { appendChat } from "../../../../core/utils/index";
@@ -9,6 +10,11 @@
   let textArea;
   let text_input = "";
   let chatBody;
+  const { userId } = data.props;
+
+  socket.on("message", (d) => {
+    appendChat(chatBody, d, "recipient");
+  });
 
   function resizeInput(e) {
     const input = e.target;
@@ -42,6 +48,7 @@
       if (chatBody.scrollHeight > chatBody.clientHeight) {
         chatBody.scrollTop = chatBody.scrollHeight;
       }
+      socket.emit("chat", text_input);
       appendChat(chatBody, text_input, "you");
       text_input = "";
     }
@@ -63,7 +70,7 @@
   </div>
 
   <div
-    class=" absolute bg-gray-500 h-32 px-5 flex items-center gap-5 bottom-0 rounded-md left-0 right-0"
+    class=" absolute bg-gray-500 h-32 px-5 flex items-center gap-5 bottom-0 rounded-md rounded-ee-none rounded-bl-none left-0 right-0"
   >
     <textarea
       bind:value={text_input}

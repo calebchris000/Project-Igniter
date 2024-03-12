@@ -9,3 +9,8 @@
 :root {
     font-family: "Poppins", sans-serif;
 }
+
+.main {
+    height: 100vh;
+    height: 100dvh;
+}

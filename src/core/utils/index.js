@@ -5,3 +5,12 @@ export function appendChat(parent, text_input, className) {
   bubble.innerHTML = parse;
   bubble.textContent && parent.appendChild(bubble);
 }
+
+export function userData() {
+  const data = ""
+
+  if (!data) {
+    return null;
+  }
+  return JSON.parse(data);
+}

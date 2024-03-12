@@ -3,7 +3,7 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "vite dev --host",
 		"build": "vite build",
 		"preview": "vite preview"
 	},
@@ -20,6 +20,9 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"moment": "^2.30.1"
+		"axios": "^1.6.7",
+		"moment": "^2.30.1",
+		"socket.io": "^4.7.4",
+		"socket.io-client": "^4.7.4"
 	}
 }

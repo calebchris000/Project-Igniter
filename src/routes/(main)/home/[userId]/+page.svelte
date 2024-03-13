@@ -1,19 +1,32 @@
 <script>
   import { socket } from "./../../../../core/chat-core/index.js";
   import UserNav from "../../../../lib/top/user-chat/index.svelte";
-  import image from "../../../../lib/images/man2.png";
   import { appendChat } from "../../../../core/utils/index";
   import "./style.css";
   /** @type {import('./$types').PageData} */
   export let data;
-
+  const { own_id, recipientId } = data.params;
   let textArea;
   let text_input = "";
   let chatBody;
-  const { userId } = data.props;
+  const { fullName, status, profileImg, socketId } = data.user;
+  const messages = data.messages;
 
-  socket.on("message", (d) => {
-    appendChat(chatBody, d, "recipient");
+  for (let i = 0; i < messages.length; i++) {
+    const element = messages[i];
+
+    if (element?.receiver === data.params.own_id && !element.read) {
+      socket.emit("message_read", { id: element?._id });
+    }
+  }
+
+  const formatStatus = `${status[0].toUpperCase()}${status.slice(1)}`;
+  socket.on("new_message", (d) => {
+    const { content, createdAt, _id, recipient } = d;
+    if (own_id === recipient) {
+      appendChat(chatBody, content, "recipient");
+      socket.emit("message_read", { id: _id });
+    }
   });
 
   function resizeInput(e) {
@@ -37,7 +50,6 @@
     }
     if (shift && input.key === "Enter") {
       shift = false;
-      console.log("shift + enter");
       return;
     }
 
@@ -48,25 +60,52 @@
       if (chatBody.scrollHeight > chatBody.clientHeight) {
         chatBody.scrollTop = chatBody.scrollHeight;
       }
-      socket.emit("chat", text_input);
+      socket.emit("chat", {
+        sender: own_id,
+        recipient: recipientId,
+        content: text_input,
+        type: "text",
+      });
       appendChat(chatBody, text_input, "you");
       text_input = "";
     }
+  }
+
+  function handleSubmit() {
+    appendChat(chatBody, text_input, "you");
+    socket.emit("chat", {
+      sender: own_id,
+      recipient: recipientId,
+      content: text_input,
+      type: "text",
+    });
+    text_input = "";
+    textArea.style.height = "3.5rem";
   }
 </script>
 
 <section class="">
   <div>
-    <UserNav {image} name="Mark Spencer" is_active={true} />
+    <UserNav image={profileImg} name={fullName} status={formatStatus} />
   </div>
 
   <div
     bind:this={chatBody}
     class="chat-body overflow-y-auto my-4 mb-10 relative flex flex-col gap-2 py-16"
   >
-    <p class="you">Hello</p>
-    <p class="recipient">Hi</p>
-    <p class="you">How u doing?</p>
+    {#if messages.length}
+      {#each messages as message}
+        {#if message.sender === own_id}
+          <p class="you">{message.content}</p>
+        {:else}
+          <p class="recipient">{message.content}</p>
+        {/if}
+      {/each}
+    {:else}
+      <p class="absolute bottom-0 text-center left-0 right-0 font-medium">
+        No messages yet. Message to start chatting.
+      </p>
+    {/if}
   </div>
 
   <div
@@ -88,14 +127,10 @@
         <svg
           role="button"
           on:keydown={() => {
-            appendChat(chatBody, text_input, "you");
-            textArea.style.height = "3.5rem";
-            text_input = "";
+            handleSubmit();
           }}
           on:click={() => {
-            appendChat(chatBody, text_input, "you");
-            text_input = "";
-            textArea.style.height = "3.5rem";
+            handleSubmit();
           }}
           tabindex={2}
           class="cursor-pointer text-5xl text-black border border-white rounded-full bg-white p-2"

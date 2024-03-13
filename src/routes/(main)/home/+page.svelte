@@ -1,24 +1,38 @@
 <script>
+  import { invalidate, invalidateAll, goto } from "$app/navigation";
   import Preview from "../../../lib/chat-preview/index.svelte";
   import NavBar from "../../../lib/top/index.svelte";
   import { initializeConnection, socket } from "../../../core/chat-core/index";
   /** @type {import('./$types').PageData} */
   export let data;
+  $: lastMessages = data?.lastMessages;
+
   let search = "";
 
-  //   initializeConnection()
+
   const _data = JSON.parse(localStorage.getItem("user"));
-  const users = data.data
+  $: users = data.data
     ?.map((u) => {
-      return { name: u.fullName, _id: u._id };
+      const last_message = lastMessages.find((l) => l.userId === u._id);
+      return {
+        name: u.fullName,
+        _id: u._id,
+        preview: last_message.lastMessage.content,
+        read: last_message.lastMessage.read,
+        unread: Number(last_message.unread),
+      };
     })
     .filter((u) => u._id !== _data._id);
   const full_name = _data.fullName;
+
+
+  socket.on("new_message", () => {
+    invalidate("api:users");
+  });
 </script>
 
 <main class="p-10 flex flex-col gap-14">
   <NavBar {full_name} />
-
   <div class="body flex flex-col gap-10">
     <div>
       <input

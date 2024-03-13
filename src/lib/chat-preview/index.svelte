@@ -5,7 +5,7 @@
   export let name = "User";
   export let id = "123";
   export let preview = "";
-  export let unread = 0;
+  export let unread = 1;
   export let read = true;
   export let message_time = moment().subtract("30", "minutes").format("HH:mm");
 </script>
@@ -23,7 +23,7 @@
         <img src={image} alt="" class="w-full" />
       {:else}
         <svg
-        class="text-5xl text-gray-700"
+          class="text-6xl text-gray-700"
           xmlns="http://www.w3.org/2000/svg"
           width="1em"
           height="1em"

@@ -1,4 +1,5 @@
 export function appendChat(parent, text_input, className) {
+  if (!parent) return;
   const bubble = document.createElement("p");
   bubble.className = className;
   const parse = text_input.replace(/\n/g, "<br>");
@@ -7,7 +8,7 @@ export function appendChat(parent, text_input, className) {
 }
 
 export function userData() {
-  const data = ""
+  const data = "";
 
   if (!data) {
     return null;

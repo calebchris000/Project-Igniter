@@ -19,6 +19,8 @@
   $: profileImg = data.user.profileImg;
   $: is_typing = false;
 
+  $: typeof window !== "undefined" && textArea && textArea.focus();
+
   $: timeout = null;
 
   const messages = data.messages;

@@ -12,14 +12,30 @@
   let textArea;
   let text_input = "";
   let chatBody;
+  $: no_chat = true;
   const { socketId } = data.user;
   $: fullName = data.user.fullName;
   $: status = data.user.status;
   $: profileImg = data.user.profileImg;
+  $: is_typing = false;
 
-  $: console.log(fullName, status, profileImg, data);
+  $: timeout = null;
+
   const messages = data.messages;
 
+  $: if (messages.length) {
+    no_chat = false;
+  }
+
+  $: formatStatus = status
+    ? `${status[0].toUpperCase()}${status.slice(1)}`
+    : "";
+
+  $: if (is_typing) {
+    timeout = setTimeout(() => {
+      is_typing = false;
+    }, 3000);
+  }
   function handleOverflow() {
     if (chatBody && chatBody.scrollHeight > chatBody.clientHeight) {
       chatBody.scrollTop = chatBody.scrollHeight;
@@ -34,18 +50,6 @@
     }
   }
 
-  $: formatStatus = status
-    ? `${status[0].toUpperCase()}${status.slice(1)}`
-    : "";
-  socket.on("new_message", (d) => {
-    const { content, createdAt, _id, recipient } = d;
-    if (own_id === recipient) {
-      appendChat(chatBody, content, "recipient");
-      handleOverflow();
-      socket.emit("message_read", { id: _id });
-    }
-  });
-
   function resizeInput(e) {
     const input = e.target;
     if (!input.value) {
@@ -59,9 +63,7 @@
   let shift = false;
 
   function handleInput(input) {
-    if (
-      !nonAlphaNumeric.includes(input.key)
-    ) {
+    if (!nonAlphaNumeric.includes(input.key)) {
       socket.emit("typing", { sender: own_id, recipient: recipientId });
       console.log(input.key);
     }
@@ -92,23 +94,15 @@
         type: "text",
       });
       appendChat(chatBody, text_input, "you");
+      no_chat && (no_chat = false);
       text_input = "";
       handleOverflow();
     }
   }
 
-  $: is_typing = false;
-
-  let timeout = null;
-
-  $: if (is_typing) {
-    timeout = setTimeout(() => {
-      is_typing = false;
-    }, 3000);
-  }
-
   function handleSubmit() {
     appendChat(chatBody, text_input, "you");
+    no_chat && (no_chat = false);
     handleOverflow();
     socket.emit("chat", {
       sender: own_id,
@@ -119,6 +113,17 @@
     text_input = "";
     textArea.style.height = "3.5rem";
   }
+
+  socket.on("new_message", (d) => {
+    const { content, createdAt, _id, recipient } = d;
+    if (own_id === recipient) {
+      appendChat(chatBody, content, "recipient");
+      no_chat && (no_chat = false);
+
+      handleOverflow();
+      socket.emit("message_read", { id: _id });
+    }
+  });
 
   socket.on("user_disconnected", () => {
     typeof window !== "undefined" && invalidate("api:userId");
@@ -166,7 +171,7 @@
           <p class="recipient">{message.content}</p>
         {/if}
       {/each}
-    {:else}
+    {:else if no_chat}
       <p class="absolute bottom-0 text-center left-0 right-0 font-medium">
         No messages yet. Message to start chatting.
       </p>

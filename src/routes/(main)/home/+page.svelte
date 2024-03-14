@@ -1,5 +1,5 @@
 <script>
-  import { invalidate, invalidateAll, goto } from "$app/navigation";
+  import { invalidate, goto } from "$app/navigation";
   import Preview from "../../../lib/chat-preview/index.svelte";
   import NavBar from "../../../lib/top/index.svelte";
   import { parseCookie } from "../../../core/utils/index";
@@ -31,7 +31,19 @@
       };
     })
     .filter((u) => u._id !== _data._id);
+
+  $: filtered = users.filter((u) => {
+    if (!search) return users;
+    return (
+      u.name.toLowerCase().trim().includes(search.toLowerCase()) ||
+      u.preview.toLowerCase().includes(search)
+    );
+  });
   const full_name = _data.fullName;
+
+  $: image_load = false;
+
+  $: console.log(image_load);
 
   socket.emit("update_status", {
     id: params.userId,
@@ -40,13 +52,13 @@
   });
 
   socket.on("user_disconnected", () => {
-    invalidate("api:users");
+    typeof window !== "undefined" && invalidate("api:users");
   });
   socket.on("new_user", () => {
-    invalidate("api:users");
+    typeof window !== "undefined" && invalidate("api:users");
   });
   socket.on("new_message", () => {
-    invalidate("api:users");
+    typeof window !== "undefined" && invalidate("api:users");
   });
 
   onDestroy(() => {
@@ -72,7 +84,7 @@
 
     <div class="flex flex-col gap-4">
       {#if users.length}
-        {#each users as { image, unread, _id: id, name, status, preview, read, message_time }}
+        {#each filtered as { image, unread, _id: id, name, status, preview, read, message_time }}
           <Preview
             {image}
             {unread}
@@ -92,7 +104,7 @@
 
   {#if open_modal}
     <div
-      class="absolute flex flex-col gap-16 inset-0 p-16 w-full h-full bg-gray-300 z-50"
+      class="absolute flex flex-col gap-16 inset-0 p-16 w-full h-full bg-gray-200 z-50"
     >
       <NavBar
         full_name="Start Chat"
@@ -109,12 +121,34 @@
             role="button"
             on:click={() => goto(`/home/${each_user._id}`)}
           >
-            <div class="w-16 rounded-full bg-gray-700 h-16"></div>
+            <div class="w-16 relative rounded-full overflow-hidden h-16">
+              <img
+                class="z-50 absolute w-full h-auto"
+                src={each_user.profileImg}
+                alt=""
+              />
+              <svg
+                class="text-[4.3rem] absolute text-gray-700"
+                xmlns="http://www.w3.org/2000/svg"
+                width="1em"
+                height="1em"
+                viewBox="0 0 48 48"
+              >
+                <g fill="currentColor">
+                  <path d="M32 20a8 8 0 1 1-16 0a8 8 0 0 1 16 0" />
+                  <path
+                    fill-rule="evenodd"
+                    d="M23.184 43.984C12.517 43.556 4 34.772 4 24C4 12.954 12.954 4 24 4s20 8.954 20 20s-8.954 20-20 20a21.253 21.253 0 0 1-.274 0c-.181 0-.362-.006-.542-.016M11.166 36.62a3.028 3.028 0 0 1 2.523-4.005c7.796-.863 12.874-.785 20.632.018a2.99 2.99 0 0 1 2.498 4.002A17.942 17.942 0 0 0 42 24c0-9.941-8.059-18-18-18S6 14.059 6 24c0 4.916 1.971 9.373 5.166 12.621"
+                    clip-rule="evenodd"
+                  />
+                </g>
+              </svg>
+            </div>
             <div>
               <p class="text-lg font-medium text-gray-800">
                 {each_user.fullName}
               </p>
-              <p class="">Blessed</p>
+              <p class="">G'day folks!</p>
             </div>
           </div>
         {/each}

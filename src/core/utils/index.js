@@ -4,6 +4,16 @@ export function appendChat(parent, text_input, className) {
   bubble.className = className;
   const parse = text_input.replace(/\n/g, "<br>");
   bubble.innerHTML = parse;
+  if (bubble.textContent.length > 500) {
+    bubble.textContent = `${bubble.textContent.slice(0, 500)}...`;
+    const read_more = document.createElement("button");
+    read_more.className = "read_more";
+    read_more.textContent = "Read more";
+    read_more.onclick = () => {
+      bubble.textContent = parse;
+    };
+    bubble.appendChild(read_more)
+  }
   bubble.textContent && parent.appendChild(bubble);
 }
 
@@ -35,7 +45,7 @@ export const nonAlphaNumeric = [
   "F12",
   "F13",
   "AudioVolumeUp",
-  "AudioVolumeDown"
+  "AudioVolumeDown",
 ];
 
 export function parseCookie(name) {

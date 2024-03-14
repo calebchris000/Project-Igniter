@@ -28,6 +28,10 @@ export async function load({ cookies, depends }) {
     };
   } catch (error) {
     console.error(error);
+    return {
+      data: [],
+      params: { userId: "", all_users: {data: []} },
+    };
   }
 }
 

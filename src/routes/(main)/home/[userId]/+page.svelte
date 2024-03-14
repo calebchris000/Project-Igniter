@@ -1,9 +1,9 @@
 <script>
-  import { invalidate } from "$app/navigation";
+  import { invalidate, goto } from "$app/navigation";
   import { onDestroy } from "svelte";
   import { socket } from "./../../../../core/chat-core/index.js";
   import UserNav from "../../../../lib/top/user-chat/index.svelte";
-  import { appendChat } from "../../../../core/utils/index";
+  import { appendChat, nonAlphaNumeric } from "../../../../core/utils/index";
   import "./style.css";
   /** @type {import('./$types').PageData} */
   export let data;
@@ -57,12 +57,14 @@
   }
 
   let shift = false;
-  function handleInput(input) {
-    if (!["Shift", "Control", "Tab", "Enter", "Alt"].includes(input.key)) {
-      socket.emit("typing", { sender: own_id, recipient: recipientId });
-    }
 
-    
+  function handleInput(input) {
+    if (
+      !nonAlphaNumeric.includes(input.key)
+    ) {
+      socket.emit("typing", { sender: own_id, recipient: recipientId });
+      console.log(input.key);
+    }
     if (input.key === "Shift") {
       shift = true;
       return;
@@ -74,12 +76,12 @@
       shift = false;
       return;
     }
-    
+
     if (input.key === "Enter") {
       input.preventDefault();
       if (!text_input) return;
       input.target.style.height = "3.5rem";
-      
+
       if (chatBody.scrollHeight > chatBody.clientHeight) {
         chatBody.scrollTop = chatBody.scrollHeight;
       }
@@ -119,18 +121,17 @@
   }
 
   socket.on("user_disconnected", () => {
-    invalidate("api:userId");
+    typeof window !== "undefined" && invalidate("api:userId");
   });
 
   socket.on("new_user", () => {
-    invalidate("api:userId");
+    typeof window !== "undefined" && invalidate("api:userId");
   });
 
   socket.on("user_typing", ({ sender, recipient }) => {
     if (sender === recipientId) {
       is_typing = true;
       clearTimeout(timeout);
-      // timeout = null;
       timeout = setTimeout(() => {
         is_typing = false;
       }, 3000);

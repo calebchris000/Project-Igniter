@@ -2,6 +2,7 @@
   import { invalidate, invalidateAll, goto } from "$app/navigation";
   import Preview from "../../../lib/chat-preview/index.svelte";
   import NavBar from "../../../lib/top/index.svelte";
+  import { parseCookie } from "../../../core/utils/index";
   import { initializeConnection, socket } from "../../../core/chat-core/index";
   import moment from "moment";
   import { onDestroy } from "svelte";
@@ -9,20 +10,19 @@
   export let data;
 
   const params = data.params;
-  $: console.log(params)
   const all_users = params.all_users.data.filter(
     (u) => u._id !== params.userId
   );
 
-  $: console.log(all_users);
   let search = "";
+  const _data = typeof window !== "undefined" ? parseCookie("user") : "";
 
-  const _data = JSON.parse(localStorage.getItem("user"));
   $: users = data.data
     ?.map((u) => {
       return {
         name: u.fullName,
         _id: u._id,
+        image: u.profileImg ?? "",
         preview: u.lastMessage.content ?? "",
         read: u.lastMessage.read,
         message_time: moment(u.lastMessage.date).format("HH:mm A"),

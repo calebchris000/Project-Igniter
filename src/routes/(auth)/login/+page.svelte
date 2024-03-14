@@ -3,19 +3,25 @@
   import Index from "../../../lib/top/index.svelte";
   import { enhance } from "$app/forms";
   import { socket } from "../../../core/chat-core";
+  import { onMount } from "svelte";
+  import { clearCookie, parseCookie } from "../../../core/utils";
   /** @type {import('./$types').PageData} */
   export let data;
   export let form;
 
   $: if (form?.status === 200) {
     const { token, ...others } = form.data;
-    localStorage.setItem("user", JSON.stringify(others));
-
+    typeof window !== "undefined" &&
+      (document.cookie = `user=${JSON.stringify(others)}; path: /; maxAge: 86400000; httpOnly: true; secure: false;`);
     goto("/home");
   } else if (form?.status) {
     alert(form.message);
   }
 
+  $: if (typeof window !== "undefined" && parseCookie("user")) {
+    clearCookie("user");
+    clearCookie("token");
+  }
   socket.emit("manual_disconnect");
 </script>
 

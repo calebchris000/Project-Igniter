@@ -21,13 +21,12 @@ export const actions = {
 
     cookies.set("token", _data.data.token, {
       path: "/",
-      httpOnly: true,
+      httpOnly: false,
       secure: url.protocol === "https",
       maxAge: 86400000,
     });
 
     const { token, ...others } = _data.data;
-
 
     return {
       status: response.status,

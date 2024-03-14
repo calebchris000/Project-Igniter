@@ -9,6 +9,13 @@
   export let unread = 1;
   export let read = true;
   export let message_time = moment().subtract("30", "minutes").format("HH:mm");
+  $: img_loaded = false;
+  const img = new Image();
+  img.src = image;
+
+  img.onload = () => {
+    img_loaded = true;
+  };
 </script>
 
 <section
@@ -20,11 +27,18 @@
 >
   <div class="relative">
     <div class="w-16 rounded-full overflow-hidden">
-      {#if image}
-        <img src={image} alt="" class="w-full" />
+      {#if img_loaded}
+        <img
+          on:error={() => {
+            image = "";
+          }}
+          src={image}
+          alt=""
+          class="w-full h-auto"
+        />
       {:else}
         <svg
-          class="text-6xl text-gray-700"
+          class="text-[4.3rem] text-gray-700"
           xmlns="http://www.w3.org/2000/svg"
           width="1em"
           height="1em"
@@ -49,15 +63,15 @@
     {/if}
     {#if status === "active"}
       <i
-        class="not-italic absolute bottom-1 right-2 rounded-full h-4 w-4 bg-green-600"
+        class="not-italic absolute bottom-1 right-1 rounded-full h-4 w-4 bg-green-600"
       ></i>
     {:else if status === "away"}
       <i
-        class="not-italic absolute bottom-1 right-2 rounded-full h-4 w-4 bg-orange-600"
+        class="not-italic absolute bottom-1 right-1 rounded-full h-4 w-4 bg-orange-600"
       ></i>
     {:else if status === "busy"}
       <i
-        class="not-italic absolute bottom-1 right-2 rounded-full h-4 w-4 bg-blue-900"
+        class="not-italic absolute bottom-1 right-1 rounded-full h-4 w-4 bg-blue-900"
       ></i>
     {/if}
   </div>

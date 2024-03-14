@@ -4,6 +4,7 @@
   export let image = "";
   export let name = "User";
   export let status = "Away";
+  export let typing = false;
   export let last_active = "";
 </script>
 
@@ -32,9 +33,13 @@
   </div>
   <div class="cursor-pointer">
     <p class="font-medium">{name}</p>
-    <p class="text-sm text-gray-500 font-medium select-none">
-      {status}
-    </p>
+
+    <div class="flex items-center gap-3">
+      <p class="text-sm text-blue-500 font-medium select-none">
+        {status}
+      </p>
+      <p style={typing ? "opacity: 1": "opacity: 0"} class="text-sm transition-all duration-75 text-blue-500 font-medium select-none">Typing...</p>
+    </div>
   </div>
   <button on:click={() => goto("/home")} class="ms-auto bg-transparent">
     <svg

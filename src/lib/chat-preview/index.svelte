@@ -5,6 +5,7 @@
   export let name = "User";
   export let id = "123";
   export let preview = "";
+  export let status = "active";
   export let unread = 1;
   export let read = true;
   export let message_time = moment().subtract("30", "minutes").format("HH:mm");
@@ -46,6 +47,19 @@
         >{unread}</i
       >
     {/if}
+    {#if status === "active"}
+      <i
+        class="not-italic absolute bottom-1 right-2 rounded-full h-4 w-4 bg-green-600"
+      ></i>
+    {:else if status === "away"}
+      <i
+        class="not-italic absolute bottom-1 right-2 rounded-full h-4 w-4 bg-orange-600"
+      ></i>
+    {:else if status === "busy"}
+      <i
+        class="not-italic absolute bottom-1 right-2 rounded-full h-4 w-4 bg-blue-900"
+      ></i>
+    {/if}
   </div>
 
   <div>
@@ -54,7 +68,7 @@
       class="text-sm text-gray-600"
       style={read ? "font-weight: 400;" : "font-weight: 600"}
     >
-      {preview.length > 25 ? preview.slice(0, 25) + "..." : preview}
+      {preview && preview.length > 25 ? preview.slice(0, 25) + "..." : preview}
     </p>
   </div>
 

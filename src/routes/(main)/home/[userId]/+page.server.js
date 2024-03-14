@@ -1,7 +1,7 @@
 /** @type {import('./$types').PageServerLoad} */
 import axios from "axios";
 import jwt from "jsonwebtoken";
-export async function load({ cookies, params }) {
+export async function load({ cookies, params, depends }) {
   try {
     const base_url = import.meta.env.VITE_SERVER_BASE_URL;
     const token = cookies.get("token");
@@ -9,6 +9,8 @@ export async function load({ cookies, params }) {
     const secret = import.meta.env.VITE_JWT_SECRET;
     const parsed = jwt.decode(token, secret);
     const own_id = parsed.id;
+
+    depends("api:userId")
 
     const response = await axios.get(`${base_url}/v1/user/${userId}`, {
       headers: {

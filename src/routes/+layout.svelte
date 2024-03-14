@@ -1,22 +1,22 @@
 <script>
-  import { goto } from "$app/navigation";
   import "../app.css";
-  import moment from "moment";
   import { socket } from "../core/chat-core";
+  import { onMount } from "svelte";
 
   /** @type {import('./$types').LayoutData} */
   export let data;
 
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  if (!user) {
-    goto("/login");
-  }
-
-  socket.emit("update_status", {
-    id: user._id,
-    status: "active",
-    lastActive: "now",
+  onMount(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) {
+      if(window.location.pathname === "/login") return
+      window.location.replace("/login")
+    }
+    socket.emit("update_status", {
+      id: user._id,
+      status: "active",
+      lastActive: "now",
+    });
   });
 </script>
 

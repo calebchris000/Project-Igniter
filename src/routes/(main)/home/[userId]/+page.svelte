@@ -1,16 +1,30 @@
 <script>
+  import { invalidate } from "$app/navigation";
+  import { onDestroy } from "svelte";
   import { socket } from "./../../../../core/chat-core/index.js";
   import UserNav from "../../../../lib/top/user-chat/index.svelte";
   import { appendChat } from "../../../../core/utils/index";
   import "./style.css";
   /** @type {import('./$types').PageData} */
   export let data;
+
   const { own_id, recipientId } = data.params;
   let textArea;
   let text_input = "";
   let chatBody;
-  const { fullName, status, profileImg, socketId } = data.user;
+  const { socketId } = data.user;
+  $: fullName = data.user.fullName;
+  $: status = data.user.status;
+  $: profileImg = data.user.profileImg;
+
+  $: console.log(fullName, status, profileImg, data);
   const messages = data.messages;
+
+  function handleOverflow() {
+    if (chatBody && chatBody.scrollHeight > chatBody.clientHeight) {
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+  }
 
   for (let i = 0; i < messages.length; i++) {
     const element = messages[i];
@@ -20,11 +34,14 @@
     }
   }
 
-  const formatStatus = `${status[0].toUpperCase()}${status.slice(1)}`;
+  $: formatStatus = status
+    ? `${status[0].toUpperCase()}${status.slice(1)}`
+    : "";
   socket.on("new_message", (d) => {
     const { content, createdAt, _id, recipient } = d;
     if (own_id === recipient) {
       appendChat(chatBody, content, "recipient");
+      handleOverflow();
       socket.emit("message_read", { id: _id });
     }
   });
@@ -41,6 +58,11 @@
 
   let shift = false;
   function handleInput(input) {
+    if (!["Shift", "Control", "Tab", "Enter", "Alt"].includes(input.key)) {
+      socket.emit("typing", { sender: own_id, recipient: recipientId });
+    }
+
+    
     if (input.key === "Shift") {
       shift = true;
       return;
@@ -52,11 +74,12 @@
       shift = false;
       return;
     }
-
+    
     if (input.key === "Enter") {
       input.preventDefault();
+      if (!text_input) return;
       input.target.style.height = "3.5rem";
-
+      
       if (chatBody.scrollHeight > chatBody.clientHeight) {
         chatBody.scrollTop = chatBody.scrollHeight;
       }
@@ -68,11 +91,23 @@
       });
       appendChat(chatBody, text_input, "you");
       text_input = "";
+      handleOverflow();
     }
+  }
+
+  $: is_typing = false;
+
+  let timeout = null;
+
+  $: if (is_typing) {
+    timeout = setTimeout(() => {
+      is_typing = false;
+    }, 3000);
   }
 
   function handleSubmit() {
     appendChat(chatBody, text_input, "you");
+    handleOverflow();
     socket.emit("chat", {
       sender: own_id,
       recipient: recipientId,
@@ -82,11 +117,40 @@
     text_input = "";
     textArea.style.height = "3.5rem";
   }
+
+  socket.on("user_disconnected", () => {
+    invalidate("api:userId");
+  });
+
+  socket.on("new_user", () => {
+    invalidate("api:userId");
+  });
+
+  socket.on("user_typing", ({ sender, recipient }) => {
+    if (sender === recipientId) {
+      is_typing = true;
+      clearTimeout(timeout);
+      // timeout = null;
+      timeout = setTimeout(() => {
+        is_typing = false;
+      }, 3000);
+    }
+  });
+
+  onDestroy(() => {
+    socket.off("new_message");
+    socket.off("user_disconnected");
+  });
 </script>
 
 <section class="">
   <div>
-    <UserNav image={profileImg} name={fullName} status={formatStatus} />
+    <UserNav
+      image={profileImg}
+      name={fullName}
+      typing={is_typing}
+      status={formatStatus}
+    />
   </div>
 
   <div

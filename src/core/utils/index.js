@@ -1,7 +1,8 @@
-export function appendChat(parent, text_input, className) {
+export function appendChat(parent, text_input, className, id) {
   if (!parent) return;
   const bubble = document.createElement("p");
   bubble.className = className;
+  bubble.id = id;
   const parse = text_input.replace(/\n/g, "<br>");
   bubble.innerHTML = parse;
   if (bubble.textContent.length > 500) {

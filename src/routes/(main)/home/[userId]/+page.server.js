@@ -46,7 +46,7 @@ export async function load({ cookies, params, depends }) {
   } catch (error) {
     return {
       error: String(error),
-      params: { own_id, recipientId: params.userId },
+      params: { own_id: "", recipientId: params.userId },
     };
   }
 }

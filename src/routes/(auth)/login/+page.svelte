@@ -14,6 +14,7 @@
     typeof window !== "undefined" &&
       (document.cookie = `user=${JSON.stringify(others)}; path: /; maxAge: 86400000; httpOnly: true; secure: false;`);
     goto("/home");
+    socket.connect()
   } else if (form?.status) {
     alert(form.message);
   }
@@ -21,8 +22,9 @@
   $: if (typeof window !== "undefined" && parseCookie("user")) {
     clearCookie("user");
     clearCookie("token");
+    socket.disconnect()
   }
-  socket.emit("manual_disconnect");
+  // socket.emit("manual_disconnect");
 </script>
 
 <section class="flex flex-col gap-10">

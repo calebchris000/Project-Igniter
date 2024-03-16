@@ -5,9 +5,14 @@
   import { parseCookie } from "../../../core/utils/index";
   import { initializeConnection, socket } from "../../../core/chat-core/index";
   import moment from "moment";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   /** @type {import('./$types').PageData} */
   export let data;
+
+
+  onMount(() => {
+    invalidate("api:users");
+  });
 
   const params = data.params;
   const all_users = params.all_users.data.filter(
@@ -22,10 +27,13 @@
       return {
         name: u.fullName,
         _id: u._id,
+        sender_id: u.lastMessage.sender,
+        own_id: params.userId,
+        typing: false,
         image: u.profileImg ?? "",
         preview: u.lastMessage.content ?? "",
-        read: u.lastMessage.read,
-        message_time: moment(u.lastMessage.date).format("HH:mm A"),
+        receipt: u.lastMessage.receipt,
+        message_time: moment(u.lastMessage.createdAt).format("HH:mm A"),
         unread: Number(u.unread),
         status: u.status,
       };
@@ -43,8 +51,6 @@
 
   $: image_load = false;
 
-  $: console.log(image_load);
-
   socket.emit("update_status", {
     id: params.userId,
     status: "active",
@@ -57,8 +63,23 @@
   socket.on("new_user", () => {
     typeof window !== "undefined" && invalidate("api:users");
   });
-  socket.on("new_message", () => {
+  socket.on("new_message", (data) => {
+    if (data?.receipt === "sent") {
+      socket.emit("receipt", { temp_id: data?.temp_id, receipt: "delivered" });
+    }
     typeof window !== "undefined" && invalidate("api:users");
+  });
+
+  socket.on("user_typing", ({ sender, recipient }) => {
+    users = users.map((u) => {
+      if (sender === u._id) {
+        return {
+          ...u,
+          typing: true,
+        };
+      }
+      return u;
+    });
   });
 
   onDestroy(() => {
@@ -68,6 +89,8 @@
   });
 
   let open_modal = false;
+
+  let show_context_menu = false;
 </script>
 
 <main class="p-10 flex flex-col gap-14">
@@ -84,15 +107,18 @@
 
     <div class="flex flex-col gap-4">
       {#if users.length}
-        {#each filtered as { image, unread, _id: id, name, status, preview, read, message_time }}
+        {#each filtered as { image, typing, own_id, sender_id, unread, _id: id, name, status, preview, receipt, message_time }}
           <Preview
             {image}
             {unread}
+            {sender_id}
+            {own_id}
+            {typing}
             {name}
             {status}
             {id}
             {preview}
-            {read}
+            {receipt}
             {message_time}
           />
         {/each}

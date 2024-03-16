@@ -1,19 +1,23 @@
 <script>
   import { invalidate, goto } from "$app/navigation";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { socket } from "./../../../../core/chat-core/index.js";
   import UserNav from "../../../../lib/top/user-chat/index.svelte";
   import { appendChat, nonAlphaNumeric } from "../../../../core/utils/index";
+  import { Menu } from "$lib/index.js";
   import "./style.css";
   /** @type {import('./$types').PageData} */
   export let data;
+
+  onMount(() => {
+    invalidate("api:userId");
+  });
 
   const { own_id, recipientId } = data.params;
   let textArea;
   let text_input = "";
   let chatBody;
   $: no_chat = true;
-  const { socketId } = data.user;
   $: fullName = data.user.fullName;
   $: status = data.user.status;
   $: profileImg = data.user.profileImg;
@@ -23,8 +27,7 @@
 
   $: timeout = null;
 
-  const messages = data.messages;
-
+  $: messages = [...data.messages];
   $: if (messages.length) {
     no_chat = false;
   }
@@ -44,11 +47,17 @@
     }
   }
 
-  for (let i = 0; i < messages.length; i++) {
+  $: for (let i = 0; i < messages?.length; i++) {
     const element = messages[i];
 
-    if (element?.receiver === data.params.own_id && !element.read) {
-      socket.emit("message_read", { id: element?._id });
+    if (
+      element?.receiver === data.params.own_id &&
+      element.receipt !== "read"
+    ) {
+      socket.emit("receipt", {
+        temp_id: Number(element?.temp_id),
+        receipt: "read",
+      });
     }
   }
 
@@ -63,11 +72,11 @@
   }
 
   let shift = false;
+  let pending_messages = [];
 
   function handleInput(input) {
     if (!nonAlphaNumeric.includes(input.key)) {
       socket.emit("typing", { sender: own_id, recipient: recipientId });
-      console.log(input.key);
     }
     if (input.key === "Shift") {
       shift = true;
@@ -89,13 +98,34 @@
       if (chatBody.scrollHeight > chatBody.clientHeight) {
         chatBody.scrollTop = chatBody.scrollHeight;
       }
+      const pending_id = Math.floor(Math.random() * 10000000);
+      pending_messages.push({
+        sender: own_id,
+        receiver: recipientId,
+        text_input,
+        temp_id: pending_id,
+      });
+
+      messages = [
+        ...messages,
+        {
+          sender: own_id,
+          content: text_input,
+          receiver: recipientId,
+          type: "text",
+          receipt: "sent",
+          temp_id: pending_id,
+        },
+      ];
+
       socket.emit("chat", {
         sender: own_id,
         recipient: recipientId,
         content: text_input,
+        temp_id: pending_id,
         type: "text",
       });
-      appendChat(chatBody, text_input, "you");
+
       no_chat && (no_chat = false);
       text_input = "";
       handleOverflow();
@@ -103,12 +133,32 @@
   }
 
   function handleSubmit() {
-    appendChat(chatBody, text_input, "you");
+    const pending_id = Math.floor(Math.random() * 10000000);
+    pending_messages.push({
+      sender: own_id,
+      message_id: pending_id,
+      receiver: recipientId,
+      text_input,
+      temp_id: pending_id,
+    });
+    messages = [
+      ...messages,
+      {
+        sender: own_id,
+        content: text_input,
+        receiver: recipientId,
+        temp_id: pending_id,
+        type: "text",
+        receipt: "sent",
+      },
+    ];
+
     no_chat && (no_chat = false);
     handleOverflow();
     socket.emit("chat", {
       sender: own_id,
       recipient: recipientId,
+      temp_id: pending_id,
       content: text_input,
       type: "text",
     });
@@ -117,14 +167,38 @@
   }
 
   socket.on("new_message", (d) => {
-    const { content, createdAt, _id, recipient } = d;
+    const { content, createdAt, _id, sender, recipient, temp_id } = d;
     if (own_id === recipient) {
-      appendChat(chatBody, content, "recipient");
+      messages = [
+        ...messages,
+        {
+          sender: recipientId,
+          recipient: own_id,
+          temp_id,
+          _id,
+          type: "text",
+          content,
+          temp_id,
+        },
+      ];
+      socket.emit("receipt", { temp_id, receipt: "read" });
       no_chat && (no_chat = false);
-
       handleOverflow();
-      socket.emit("message_read", { id: _id });
     }
+  });
+
+  socket.on("update_receipt", (data) => {
+    messages = messages?.map((m) => {
+      if (Number(m?.temp_id) === Number(data?.temp_id)) {
+        return {
+          ...m,
+          temp_id: data?.temp_id,
+          receipt: data?.receipt,
+          _id: data?._id,
+        };
+      }
+      return m;
+    });
   });
 
   socket.on("user_disconnected", () => {
@@ -145,7 +219,48 @@
     }
   });
 
+  let show_context_menu = false;
+  let context_listener = null;
+  let click_listener = null;
+  let selected_message_id = "";
+  $: [x, y] = [0, 0];
+
+  onMount(() => {
+    click_listener = document.addEventListener("click", (e) => {
+      if (
+        !e.target.classList.contains("you") ||
+        !e.target.classList.contains("recipient")
+      ) {
+        show_context_menu = false;
+      }
+    });
+    context_listener = document.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+
+      if (
+        e.target.classList.contains("you") ||
+        e.target.classList.contains("recipient")
+      ) {
+        const rect = e.target.getBoundingClientRect();
+        const parent_rect = chatBody.getBoundingClientRect();
+        selected_message_id = e.target.id;
+        x =
+          e.target.className === "you"
+            ? parent_rect.right - 40
+            : parent_rect.left + 60;
+        y = rect.top + 44;
+        show_context_menu = true;
+      } else {
+        show_context_menu = false;
+      }
+    });
+  });
+
   onDestroy(() => {
+    typeof window !== "undefined" &&
+      removeEventListener("contextmenu", context_listener);
+    typeof window !== "undefined" &&
+      removeEventListener("click", click_listener);
     socket.off("new_message");
     socket.off("user_disconnected");
   });
@@ -153,6 +268,19 @@
 
 <section class="">
   <div>
+    <Menu
+      handle_click={({ option, message_id }) => {
+        switch (option) {
+          case "Delete":
+        }
+        console.log({ option, message_id });
+      }}
+      {show_context_menu}
+      message_id={selected_message_id}
+      options={["Select", "Delete"]}
+      {x}
+      {y}
+    />
     <UserNav
       image={profileImg}
       name={fullName}
@@ -166,11 +294,24 @@
     class="chat-body overflow-y-auto my-4 mb-10 relative flex flex-col gap-2 py-16"
   >
     {#if messages.length}
-      {#each messages as message}
+      {#each messages as message, idx (idx)}
         {#if message.sender === own_id}
-          <p class="you">{message.content}</p>
+          <div class="you flex flex-col">
+            <p id={message._id} class="message flex m-0 flex-col">
+              {message.content}<br />
+            </p>
+            <p class="self-end text-xs">
+              {message.receipt === "sent"
+                ? "Sent"
+                : message.receipt === "delivered"
+                  ? "Delivered"
+                  : message.receipt === "read"
+                    ? "Read"
+                    : "Pending"}
+            </p>
+          </div>
         {:else}
-          <p class="recipient">{message.content}</p>
+          <p id={message._id} class="recipient m-0">{message.content}</p>
         {/if}
       {/each}
     {:else if no_chat}

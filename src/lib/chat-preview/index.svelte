@@ -3,13 +3,24 @@
   import { goto } from "$app/navigation";
   export let image = "";
   export let name = "User";
-  export let id = "123";
+  export let id = "";
   export let preview = "";
   export let status = "active";
+  export let sender_id = "";
+  export let own_id = "";
   export let unread = 1;
-  export let read = true;
+  export let typing = false;
+  export let receipt = "";
   export let message_time = moment().subtract("30", "minutes").format("HH:mm");
-  $: img_loaded = false;
+
+  let timeout = null;
+  $: if (typing) {
+    clearTimeout(timeout);
+    timeout = null;
+    timeout = setTimeout(() => {
+      typing = false;
+    }, 3000);
+  }
 </script>
 
 <section
@@ -45,7 +56,7 @@
     </div>
     {#if unread}
       <i
-        class="absolute top-0 right-0 z-30 not-italic rounded-full w-6 h-6 flex justify-center items-center bg-red-500 text-white"
+        class="absolute top-0 right-0 z-40 not-italic rounded-full w-6 h-6 flex justify-center items-center bg-red-500 text-white"
         >{unread}</i
       >
     {/if}
@@ -68,9 +79,19 @@
     <p class="text-lg font-medium text-gray-800">{name}</p>
     <p
       class="text-sm text-gray-600"
-      style={read ? "font-weight: 400;" : "font-weight: 600"}
+      style={sender_id === own_id ||
+      (sender_id !== own_id && receipt === "read")
+        ? "font-weight: 400;"
+        : sender_id !== own_id &&
+            (receipt === "sent" || receipt === "delivered")
+          ? "font-weight: 600"
+          : ""}
     >
-      {preview && preview.length > 25 ? preview.slice(0, 25) + "..." : preview}
+      {typing
+        ? "typing..."
+        : preview && preview.length > 25
+          ? preview.slice(0, 25) + "..."
+          : preview}
     </p>
   </div>
 

@@ -4,12 +4,12 @@ import jwt from "jsonwebtoken";
 
 export async function load({ cookies, depends }) {
   try {
+    depends("api:users");
     const base_url = import.meta.env.VITE_SERVER_BASE_URL;
     const token = cookies.get("token");
     const secret = import.meta.env.VITE_JWT_SECRET;
 
     const user = jwt.verify(token, secret);
-    depends("api:users");
     const response = await axios.get(`${base_url}/v1/users/recent`, {
       headers: {
         Authorization: `Bearer ${token}`,

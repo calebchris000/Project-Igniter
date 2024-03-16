@@ -7,8 +7,11 @@
 }
 
 .you {
-  background-color: rgb(37 99 235);
   margin-left: auto;
+}
+
+.you .message {
+  background-color: rgb(37 99 235);
 }
 
 .recipient {
@@ -16,7 +19,12 @@
   font-style: normal;
 }
 
-.you,
+.message {
+  /* margin-left: auto; */
+  margin: 0;
+}
+
+.you .message,
 .recipient {
   border-radius: 0.75rem;
   width: fit-content;

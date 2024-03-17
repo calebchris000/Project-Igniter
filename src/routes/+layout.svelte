@@ -1,4 +1,5 @@
 <script>
+  import { invalidate } from "$app/navigation";
   import "../app.css";
   import { socket } from "../core/chat-core";
   import { onDestroy, onMount } from "svelte";
@@ -32,6 +33,9 @@
         c.notification.message = "You are connected";
         return c;
       });
+
+    typeof window !== "undefined" && invalidate("api:users");
+    typeof window !== "undefined" && invalidate("api:userId");
   });
 
   socket.on("disconnect", () => {

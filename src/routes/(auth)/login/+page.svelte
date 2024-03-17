@@ -18,7 +18,7 @@
     store.update((c) => {
       c.notification.show = true;
       c.notification.status = "success";
-      c.notification.title = "Successi";
+      c.notification.title = "Success";
       c.notification.message = "Login Successful";
       return c;
     });

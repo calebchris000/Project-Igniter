@@ -2,12 +2,20 @@
   import { goto } from "$app/navigation";
   import Index from "../../../lib/top/index.svelte";
   import { enhance } from "$app/forms";
+  import { store } from "../../../lib";
 
   /** @type {import('./$types').PageData} */
   export let data;
   export let form;
 
   $: if (form && form.status === 201) {
+    store.update((c) => {
+      c.notification.show = true;
+      c.notification.status = "success";
+      c.notification.title = "Signup Successful"
+      c.notification.message = "Account created"
+      return c;
+    });
     goto("/login");
   }
 </script>
@@ -59,3 +67,7 @@
     >
   </form>
 </section>
+
+<svelte:head>
+  <title>Signup</title>
+</svelte:head>

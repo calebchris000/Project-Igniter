@@ -5,6 +5,7 @@
   import { socket } from "../../../core/chat-core";
   import { onMount } from "svelte";
   import { clearCookie, parseCookie } from "../../../core/utils";
+  import { store } from "$lib/store";
   /** @type {import('./$types').PageData} */
   export let data;
   export let form;
@@ -13,18 +14,31 @@
     const { token, ...others } = form.data;
     typeof window !== "undefined" &&
       (document.cookie = `user=${JSON.stringify(others)}; path: /; maxAge: 86400000; httpOnly: true; secure: false;`);
+
+    store.update((c) => {
+      c.notification.show = true;
+      c.notification.status = "success";
+      c.notification.title = "Successi";
+      c.notification.message = "Login Successful";
+      return c;
+    });
     goto("/home");
-    socket.connect()
+    socket.connect();
   } else if (form?.status) {
-    alert(form.message);
+    store.update((c) => {
+      c.notification.show = true;
+      c.notification.status = form?.status !== 200 ? "error" : "info";
+      c.notification.title = form?.status !== 200 ? "Login Failed" : "Info";
+      c.notification.message = form?.message;
+      return c;
+    });
   }
 
   $: if (typeof window !== "undefined" && parseCookie("user")) {
     clearCookie("user");
     clearCookie("token");
-    socket.disconnect()
+    socket.disconnect();
   }
-  // socket.emit("manual_disconnect");
 </script>
 
 <section class="flex flex-col gap-10">
@@ -59,3 +73,7 @@
     >
   </form>
 </section>
+
+<svelte:head>
+  <title>Login</title>
+</svelte:head>

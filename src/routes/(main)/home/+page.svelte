@@ -6,9 +6,9 @@
   import { initializeConnection, socket } from "../../../core/chat-core/index";
   import moment from "moment";
   import { onDestroy, onMount } from "svelte";
+  import { store } from "$lib/store";
   /** @type {import('./$types').PageData} */
   export let data;
-
 
   onMount(() => {
     invalidate("api:users");

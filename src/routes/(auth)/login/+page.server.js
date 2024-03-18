@@ -35,10 +35,20 @@ export const actions = {
         data: _data.data,
       };
     } catch (error) {
-      console.log(error.response.data.message);
+      if (error.response) {
+        return {
+          status: error?.response?.status,
+          message: error?.response?.data?.message,
+        };
+      } else if (error.request) {
+        return {
+          status: 503,
+          message: "Cannot connect to server. Are you connected to the internet?",
+        };
+      }
       return {
-        status: 404,
-        message: error.response.data?.message,
+        status: 500,
+        message: error.message,
       };
     }
   },

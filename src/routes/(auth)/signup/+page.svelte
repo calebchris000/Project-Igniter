@@ -18,6 +18,15 @@
     });
     goto("/login");
   }
+  else if(form?.status && form.status !== 201) {
+    store.update((c) => {
+      c.notification.show = true;
+      c.notification.status = "error";
+      c.notification.title = "Signup Failed"
+      c.notification.message = form?.message
+      return c;
+    });
+  }
 </script>
 
 <section class="flex flex-col gap-10">

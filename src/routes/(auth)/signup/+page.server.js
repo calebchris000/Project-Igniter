@@ -25,7 +25,21 @@ export const actions = {
       const data = response.data;
       return { ...data, status: response.status };
     } catch (error) {
-      return String(error);
+      if (error.response) {
+        return {
+          status: error?.response?.data?.message,
+          message: error?.response?.data?.message,
+        };
+      } else if (error.request) {
+        return {
+          status: 503,
+          message: "Cannot connect to server. Are you connected to the internet?",
+        };
+      }
+      return {
+        status: 500,
+        message: error.message,
+      };
     }
   },
 };

@@ -25,7 +25,7 @@
   socket.on("connect", () => {
     const token = typeof window !== "undefined" ? parseCookie("token") : "";
 
-    if (token)
+    if (token) {
       store.update((c) => {
         c.notification.show = true;
         c.notification.status = "success";
@@ -33,6 +33,7 @@
         c.notification.message = "You are connected";
         return c;
       });
+    }
 
     typeof window !== "undefined" && invalidate("api:users");
     typeof window !== "undefined" && invalidate("api:userId");
@@ -43,7 +44,7 @@
       c.notification.show = true;
       c.notification.status = "info";
       c.notification.title = `Connection Lost`;
-      c.notification.message = "You are offline";
+      c.notification.message = "You are offline. Connect to a network to continue chatting.";
       return c;
     });
   });

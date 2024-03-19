@@ -1,4 +1,4 @@
-# Chat Application Documentation
+# Project Igniter Application Documentation
 
 ## Overview
 

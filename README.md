@@ -58,7 +58,6 @@ The Chat Application is built using SvelteKit, a framework for building web appl
 - **User Profiles**: Manage user profiles, including profile pictures and personal information.
 - **Real-time Chat**: Send and receive messages in real-time using Socket.io.
 - **Notifications**: Receive notifications for new messages, friend requests, and more.
-- **Search and Discovery**: Find other users and join chat rooms.
 
 ## Response Data Model
 
@@ -77,10 +76,6 @@ The application uses a consistent response data model across all endpoints. A ty
 - `status`: HTTP status code of the response.
 - `message`: A human-readable message describing the result of the operation.
 - `data`: The actual data returned by the endpoint. The structure of this object varies depending on the endpoint.
-
-## Contributing
-
-Contributions are welcome! Please read the [contributing guidelines](CONTRIBUTING.md) before getting started.
 
 ## License
 

@@ -1,34 +1,38 @@
 <script>
   import { goto } from "$app/navigation";
-
+  import { onMount } from "svelte";
+  import Profile from "../../../components/icons/Profile.svelte";
   export let image = "";
   export let name = "User";
   export let status = "Away";
   export let typing = false;
   export let last_active = "";
+  export let clicked = () => {};
+
+  $: image_load = false;
+
+  onMount(() => {
+    const img = new Image();
+    img.src = image;
+
+    img.onload = () => {
+      image_load = true;
+    };
+  });
 </script>
 
-<section class="flex items-center gap-5">
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<section
+  class="flex items-center gap-5"
+  role="button"
+  on:click={clicked}
+  tabindex="0"
+>
   <div class="w-16 overflow-hidden rounded-full">
-    {#if image}
+    {#if image_load}
       <img src={image} alt="" />
     {:else}
-      <svg
-        class="text-5xl"
-        xmlns="http://www.w3.org/2000/svg"
-        width="1em"
-        height="1em"
-        viewBox="0 0 48 48"
-      >
-        <g fill="currentColor">
-          <path d="M32 20a8 8 0 1 1-16 0a8 8 0 0 1 16 0" />
-          <path
-            fill-rule="evenodd"
-            d="M23.184 43.984C12.517 43.556 4 34.772 4 24C4 12.954 12.954 4 24 4s20 8.954 20 20s-8.954 20-20 20a21.253 21.253 0 0 1-.274 0c-.181 0-.362-.006-.542-.016M11.166 36.62a3.028 3.028 0 0 1 2.523-4.005c7.796-.863 12.874-.785 20.632.018a2.99 2.99 0 0 1 2.498 4.002A17.942 17.942 0 0 0 42 24c0-9.941-8.059-18-18-18S6 14.059 6 24c0 4.916 1.971 9.373 5.166 12.621"
-            clip-rule="evenodd"
-          />
-        </g>
-      </svg>
+      <Profile />
     {/if}
   </div>
   <div class="cursor-pointer">
@@ -38,7 +42,12 @@
       <p class="text-sm text-blue-500 font-medium select-none">
         {status}
       </p>
-      <p style={typing ? "opacity: 1": "opacity: 0"} class="text-sm transition-all duration-75 text-blue-500 font-medium select-none">Typing...</p>
+      <p
+        style={typing ? "opacity: 1" : "opacity: 0"}
+        class="text-sm transition-all duration-75 text-blue-500 font-medium select-none"
+      >
+        Typing...
+      </p>
     </div>
   </div>
   <button on:click={() => goto("/home")} class="ms-auto bg-transparent">

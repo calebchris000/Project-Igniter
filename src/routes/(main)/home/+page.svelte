@@ -10,6 +10,10 @@
   /** @type {import('./$types').PageData} */
   export let data;
 
+  $: if (data?.status === 401) {
+    typeof window !== undefined && window.location.replace("/login")
+  }
+
   onMount(() => {
     invalidate("api:users");
   });
@@ -40,7 +44,7 @@
     })
     .filter((u) => u._id !== _data._id);
 
-  $: filtered = users.filter((u) => {
+  $: filtered = users?.filter((u) => {
     if (!search) return users;
     return (
       u.name.toLowerCase().trim().includes(search.toLowerCase()) ||
@@ -106,7 +110,7 @@
     </div>
 
     <div class="flex flex-col gap-4">
-      {#if users.length}
+      {#if users && users.length}
         {#each filtered as { image, typing, own_id, sender_id, unread, _id: id, name, status, preview, receipt, message_time }}
           <Preview
             {image}

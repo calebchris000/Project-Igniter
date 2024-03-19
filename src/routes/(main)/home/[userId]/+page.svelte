@@ -282,6 +282,9 @@
       {y}
     />
     <UserNav
+      clicked={() => {
+        goto(`${data.params.recipientId}/profile`);
+      }}
       image={profileImg}
       name={fullName}
       typing={is_typing}

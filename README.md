@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides a comprehensive guide to the Chat Application built using SvelteKit. The application is designed to facilitate real-time communication between users, offering features such as user authentication, profile management, chat functionality, notifications, and more. This README outlines the application's architecture, key features, and how to set it up and run it locally.
+This document provides a comprehensive guide to the Projet Igniter Application built using SvelteKit. The application is designed to facilitate real-time communication between users, offering features such as user authentication, profile management, chat functionality, notifications, and more. This README outlines the application's architecture, key features, and how to set it up and run it locally.
 
 ## Table of Contents
 
@@ -43,7 +43,7 @@ The application will be available at `http://localhost:5173` (or another port if
 
 ## Application Architecture
 
-The Chat Application is built using SvelteKit, a framework for building web applications. The project is structured as follows:
+Project Igniter Application is built using SvelteKit, a framework for building web applications. The project is structured as follows:
 
 - `src`: Contains the source code of the application.
  - `components`: Reusable UI components.
@@ -83,4 +83,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ---
 
-This README provides a high-level overview of the Chat Application. For more detailed information on specific features or components, please refer to the documentation within the codebase or the individual component files.
+This README provides a high-level overview of the Projet Igniter Application. For more detailed information on specific features or components, please refer to the documentation within the codebase or the individual component files.

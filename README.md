@@ -24,11 +24,11 @@ This document provides a comprehensive guide to the Chat Application built using
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/chat-application.git
+   [git clone https://github.com/yourusername/chat-application.git](https://github.com/calebchris000/Project-Igniter.git)
    ```
 2. Navigate to the project directory:
    ```
-   cd chat-application
+   cd Project-Igniter
    ```
 3. Install dependencies:
    ```
@@ -39,7 +39,7 @@ This document provides a comprehensive guide to the Chat Application built using
    npm run dev
    ```
 
-The application will be available at `http://localhost:5000` (or another port if 5000 is already in use).
+The application will be available at `http://localhost:5173` (or another port if 5000 is already in use).
 
 ## Application Architecture
 
@@ -69,7 +69,7 @@ The application uses a consistent response data model across all endpoints. A ty
  "status": 200,
  "message": "Success",
  "data": {
-    // Data specific to the endpoint
+    // Data specific to the endpoint if the response is successfuul
  }
 }
 ```

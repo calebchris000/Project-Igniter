@@ -24,7 +24,7 @@ This document provides a comprehensive guide to the Chat Application built using
 
 1. Clone the repository:
    ```
-   [git clone https://github.com/yourusername/chat-application.git](https://github.com/calebchris000/Project-Igniter.git)
+   git clone https://github.com/yourusername/chat-application.git
    ```
 2. Navigate to the project directory:
    ```

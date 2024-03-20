@@ -14,18 +14,20 @@
     typeof window !== undefined && window.location.replace("/login");
   }
 
-  $: if (data?.params?.cached_users) {
-    const cached_users = JSON.parse(data?.params?.cached_users);
+  $: if (!data.params.connected) {
+    const cached_users = JSON.parse(localStorage.getItem("home"));
+    if (!cached_users) {
+      const { pathname } = window.location;
+      localStorage.setItem("last_route", JSON.stringify(pathname));
+      window.location.replace("/not-connected");
+    }
     const make_all_inactive = cached_users?.data?.map((c) => {
       return { ...c, status: "away" };
     });
-    cached_users.data = make_all_inactive
+    cached_users.data = make_all_inactive;
     data = cached_users;
-    
-    $store.notification.show = true;
-    $store.notification.status = "info";
-    $store.notification.title = `You're Offline`;
-    $store.notification.message = "Please connect to the internet";
+  } else {
+    localStorage.setItem("home", JSON.stringify(data));
   }
 
   onMount(() => {

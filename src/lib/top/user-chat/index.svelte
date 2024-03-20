@@ -50,7 +50,7 @@
       </p>
     </div>
   </div>
-  <button on:click={() => goto("/home")} class="ms-auto bg-transparent">
+  <button on:click|stopPropagation={() => goto("/home")} class="ms-auto bg-transparent">
     <svg
       class="text-4xl"
       xmlns="http://www.w3.org/2000/svg"

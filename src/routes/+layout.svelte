@@ -1,6 +1,7 @@
 <script>
   import { invalidate } from "$app/navigation";
   import "../app.css";
+  import { goto } from "$app/navigation";
   import { socket } from "../core/chat-core";
   import { onDestroy, onMount } from "svelte";
   import { parseCookie } from "../core/utils";
@@ -9,6 +10,7 @@
 
   /** @type {import('./$types').LayoutData} */
   export let data;
+
 
   const user = typeof window !== "undefined" ? parseCookie("user") : "";
 

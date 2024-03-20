@@ -6,12 +6,26 @@
   import { initializeConnection, socket } from "../../../core/chat-core/index";
   import moment from "moment";
   import { onDestroy, onMount } from "svelte";
-  import { store } from "$lib/store";
+  import { store } from "../../../lib/store";
   /** @type {import('./$types').PageData} */
   export let data;
 
   $: if (data?.status === 401) {
-    typeof window !== undefined && window.location.replace("/login")
+    typeof window !== undefined && window.location.replace("/login");
+  }
+
+  $: if (data?.params?.cached_users) {
+    const cached_users = JSON.parse(data?.params?.cached_users);
+    const make_all_inactive = cached_users?.data?.map((c) => {
+      return { ...c, status: "away" };
+    });
+    cached_users.data = make_all_inactive
+    data = cached_users;
+    
+    $store.notification.show = true;
+    $store.notification.status = "info";
+    $store.notification.title = `You're Offline`;
+    $store.notification.message = "Please connect to the internet";
   }
 
   onMount(() => {

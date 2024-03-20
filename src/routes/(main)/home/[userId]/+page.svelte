@@ -18,9 +18,9 @@
   let text_input = "";
   let chatBody;
   $: no_chat = true;
-  $: fullName = data.user.fullName;
-  $: status = data.user.status;
-  $: profileImg = data.user.profileImg;
+  $: fullName = data?.user?.fullName;
+  $: status = data?.user?.status;
+  $: profileImg = data?.user?.profileImg;
   $: is_typing = false;
 
   $: typeof window !== "undefined" && textArea && textArea.focus();

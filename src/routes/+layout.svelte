@@ -23,6 +23,17 @@
   });
 
   socket.on("connect", () => {
+    const current_path =
+      typeof window !== "undefined" ? window.location.pathname : "/";
+
+    if (current_path === "/not-connected") {
+      const last_route =
+        typeof window !== "undefined"
+          ? JSON.parse(localStorage.getItem("last_route")) || "/home"
+          : "/home";
+
+      window.location.replace(last_route);
+    }
     const token = typeof window !== "undefined" ? parseCookie("token") : "";
 
     if (token) {
@@ -44,7 +55,8 @@
       c.notification.show = true;
       c.notification.status = "info";
       c.notification.title = `Connection Lost`;
-      c.notification.message = "You are offline. Connect to a network to continue chatting.";
+      c.notification.message =
+        "You are offline. Connect to a network to continue chatting.";
       return c;
     });
   });

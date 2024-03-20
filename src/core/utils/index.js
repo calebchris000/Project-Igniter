@@ -13,7 +13,7 @@ export function appendChat(parent, text_input, className, id) {
     read_more.onclick = () => {
       bubble.textContent = parse;
     };
-    bubble.appendChild(read_more)
+    bubble.appendChild(read_more);
   }
   bubble.textContent && parent.appendChild(bubble);
 }
@@ -66,6 +66,26 @@ export function parseCookie(name) {
     }
   }
   return "";
+}
+
+export function setCookie(cookies, name, value, days) {
+  let expires = "";
+  if (days) {
+    const date = new Date();
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+    expires = "; expires=" + date.toUTCString();
+  }
+
+  if (cookies) {
+    cookies.set(name, JSON.stringify(value), {
+      path: "/",
+      httpOnly: false,
+      secure: false,
+      maxAge: 86400000,
+    });
+  } else {
+    document.cookie = name + "=" + (value || "") + expires + "; path=/";
+  }
 }
 
 export function clearCookie(name) {

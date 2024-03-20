@@ -13,21 +13,39 @@
     invalidate("api:userId");
   });
 
-  const { own_id, recipientId } = data.params;
+  $: own_id = data.params.own_id;
+  $: recipientId = data.params.recipientId;
   let textArea;
   let text_input = "";
   let chatBody;
   $: no_chat = true;
-  $: fullName = data.user.fullName;
-  $: status = data.user.status;
-  $: profileImg = data.user.profileImg;
+  $: fullName = data?.user?.fullName;
+  $: status = data?.user?.status;
+  $: profileImg = data?.user?.profileImg;
   $: is_typing = false;
 
   $: typeof window !== "undefined" && textArea && textArea.focus();
 
   $: timeout = null;
 
+  $: if (!data.params.connected) {
+    const parsed_user = JSON.parse(
+      localStorage.getItem(`${data.params.recipientId}`)
+    );
+
+    if(!parsed_user) {
+      localStorage.setItem("last_route", JSON.stringify(window.location.pathname));
+      location.replace("/not-connected")
+    }
+    parsed_user.user.status = "away";
+    data = parsed_user;
+    own_id = parsed_user.user._id;
+  } else {
+    localStorage.setItem(`${data.params.recipientId}`, JSON.stringify(data));
+  }
+
   $: messages = [...data.messages];
+
   $: if (messages.length) {
     no_chat = false;
   }
@@ -282,6 +300,9 @@
       {y}
     />
     <UserNav
+      clicked={() => {
+        goto(`${data.params.recipientId}/profile`);
+      }}
       image={profileImg}
       name={fullName}
       typing={is_typing}

@@ -6,9 +6,29 @@
   import { initializeConnection, socket } from "../../../core/chat-core/index";
   import moment from "moment";
   import { onDestroy, onMount } from "svelte";
-  import { store } from "$lib/store";
+  import { store } from "../../../lib/store";
   /** @type {import('./$types').PageData} */
   export let data;
+
+  $: if (data?.status === 401) {
+    typeof window !== undefined && window.location.replace("/login");
+  }
+
+  $: if (!data.params.connected) {
+    const cached_users = JSON.parse(localStorage.getItem("home"));
+    if (!cached_users) {
+      const { pathname } = window.location;
+      localStorage.setItem("last_route", JSON.stringify(pathname));
+      window.location.replace("/not-connected");
+    }
+    const make_all_inactive = cached_users?.data?.map((c) => {
+      return { ...c, status: "away" };
+    });
+    cached_users.data = make_all_inactive;
+    data = cached_users;
+  } else {
+    localStorage.setItem("home", JSON.stringify(data));
+  }
 
   onMount(() => {
     invalidate("api:users");
@@ -40,7 +60,7 @@
     })
     .filter((u) => u._id !== _data._id);
 
-  $: filtered = users.filter((u) => {
+  $: filtered = users?.filter((u) => {
     if (!search) return users;
     return (
       u.name.toLowerCase().trim().includes(search.toLowerCase()) ||
@@ -106,7 +126,7 @@
     </div>
 
     <div class="flex flex-col gap-4">
-      {#if users.length}
+      {#if users && users.length}
         {#each filtered as { image, typing, own_id, sender_id, unread, _id: id, name, status, preview, receipt, message_time }}
           <Preview
             {image}

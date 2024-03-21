@@ -6,7 +6,8 @@ const state = {
     status: "info",
     title: "",
     message: "This is a test message from store.",
-    timeout: 3000
+    timeout: 3000,
+    reason: null,
   },
 };
 

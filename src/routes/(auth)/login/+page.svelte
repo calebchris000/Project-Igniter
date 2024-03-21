@@ -3,26 +3,26 @@
   import Index from "../../../lib/top/index.svelte";
   import { enhance } from "$app/forms";
   import { socket } from "../../../core/chat-core";
-  import { onMount } from "svelte";
   import { clearCookie, parseCookie } from "../../../core/utils";
   import { store } from "$lib/store";
   /** @type {import('./$types').PageData} */
   export let data;
   export let form;
 
+  let navigate = false;
+
   $: if (form?.status === 200) {
     const { token, ...others } = form.data;
-    typeof window !== "undefined" &&
-      (document.cookie = `user=${JSON.stringify(others)}; path: /; maxAge: 86400000; httpOnly: true; secure: false;`);
-
+    document.cookie = `user=${JSON.stringify(others)}; path: /; maxAge: 86400000; httpOnly: true; secure: false;`;
     store.update((c) => {
+      c.notification.reason = "logged_in";
       c.notification.show = true;
       c.notification.status = "success";
-      c.notification.title = "Success";
-      c.notification.message = "Login Successful";
+      c.notification.title = `Login Successful`;
+      c.notification.message = "You are successfully logged in!";
       return c;
     });
-    goto("/home");
+    navigate = true;
     socket.connect();
   } else if (form?.status) {
     store.update((c) => {
@@ -34,9 +34,20 @@
     });
   }
 
-  $: if (typeof window !== "undefined" && parseCookie("user")) {
+  $: if (navigate) {
+    setTimeout(() => {
+      goto("/home");
+    }, 200);
+    navigate = false;
+  }
+
+  $: if (parseCookie("user")) {
     clearCookie("user");
     clearCookie("token");
+    store.update((c) => {
+      c.notification.reason = "logout";
+      return c;
+    });
     socket.disconnect();
   }
 </script>

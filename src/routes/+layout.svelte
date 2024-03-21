@@ -11,34 +11,34 @@
   /** @type {import('./$types').LayoutData} */
   export let data;
 
-
-  const user = typeof window !== "undefined" ? parseCookie("user") : "";
+  const user = typeof window !== "undefined" && parseCookie("user");
 
   onMount(() => {
     if (!user) {
       const { pathname } = window.location;
 
       if (pathname === "/login" || pathname === "/signup") return;
-      // goto("/login");
       window.location.replace("/login");
     }
   });
 
   socket.on("connect", () => {
-    const current_path =
-      typeof window !== "undefined" ? window.location.pathname : "/";
+    let reason = "";
+    store.subscribe((c) => {
+      reason = c.notification.reason;
+    });
 
-    if (current_path === "/not-connected") {
-      const last_route =
-        typeof window !== "undefined"
-          ? JSON.parse(localStorage.getItem("last_route")) || "/home"
-          : "/home";
-
-      window.location.replace(last_route);
+    if(reason === "disconnect") {
+      store.update((c) => {
+        c.notification.reason = null;
+        c.notification.show = true;
+        c.notification.status = "success";
+        c.notification.title = `Connected Back`;
+        c.notification.message = "Connection is back!";
+        return c;
+      });
     }
-    const token = typeof window !== "undefined" ? parseCookie("token") : "";
-
-    if (token) {
+    else if(reason !== "logged_in") {
       store.update((c) => {
         c.notification.show = true;
         c.notification.status = "success";
@@ -47,13 +47,29 @@
         return c;
       });
     }
+    const current_path =
+      typeof window !== "undefined" ? window.location.pathname : "/";
 
+    if (current_path === "/not-connected") {
+      const last_route =
+        (typeof window !== "undefined" &&
+          JSON.parse(localStorage.getItem("last_route"))) ||
+        "/home";
+
+      window.location.replace(last_route);
+    }
     typeof window !== "undefined" && invalidate("api:users");
     typeof window !== "undefined" && invalidate("api:userId");
   });
 
   socket.on("disconnect", () => {
+    let reason = "";
+    store.subscribe((c) => {
+      reason = c.notification.reason;
+    });
+    if (reason === "logout") return;
     store.update((c) => {
+      c.notification.reason = "disconnect";
       c.notification.show = true;
       c.notification.status = "info";
       c.notification.title = `Connection Lost`;
@@ -61,12 +77,6 @@
         "You are offline. Connect to a network to continue chatting.";
       return c;
     });
-  });
-
-  socket.emit("update_status", {
-    id: user._id,
-    status: "active",
-    lastActive: "now",
   });
 
   onDestroy(() => {

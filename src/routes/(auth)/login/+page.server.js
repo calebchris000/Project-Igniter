@@ -28,6 +28,15 @@ export const actions = {
         maxAge: 86400000,
       });
 
+      store.update((c) => {
+        c.notification.show = true;
+        c.notification.status = "success";
+        c.notification.title = "Success";
+        c.notification.message = "Login Successful";
+
+        return c;
+      });
+
       const { token, ...others } = _data.data;
       return {
         status: response.status,
@@ -43,7 +52,8 @@ export const actions = {
       } else if (error.request) {
         return {
           status: 503,
-          message: "Cannot connect to server. Are you connected to the internet?",
+          message:
+            "Cannot connect to server. Are you connected to the internet?",
         };
       }
       return {

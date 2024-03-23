@@ -28,20 +28,11 @@ export const actions = {
         maxAge: 86400000,
       });
 
-      store.update((c) => {
-        c.notification.show = true;
-        c.notification.status = "success";
-        c.notification.title = "Success";
-        c.notification.message = "Login Successful";
-
-        return c;
-      });
-
       const { token, ...others } = _data.data;
       return {
         status: response.status,
         message: _data.message,
-        data: _data.data,
+        data: others,
       };
     } catch (error) {
       if (error.response) {

@@ -10,12 +10,14 @@ export async function load({ params }) {
       return {
         status: response.status,
         message: data.message,
+        data: {},
         params,
       };
     }
     return {
       status: 200,
       message: "Connected",
+      data: {},
       params,
     };
   } catch (error) {
@@ -23,18 +25,21 @@ export async function load({ params }) {
       return {
         status: 500,
         message: error?.response?.data?.message,
+        data: {},
         params,
       };
     } else if (error.request) {
       return {
         status: 500,
         message: "Cannot connect to server. Are you connected to the internet?",
+        data: {},
         params,
       };
     }
     return {
       status: 500,
       message: error.message,
+      data: {},
       params,
     };
   }

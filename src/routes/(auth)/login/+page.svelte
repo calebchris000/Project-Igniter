@@ -5,6 +5,8 @@
   import { socket } from "../../../core/chat-core";
   import { clearCookie, parseCookie } from "../../../core/utils";
   import { store } from "$lib/store";
+  import Text from "../../../components/input/Text.svelte";
+  import Button from "../../../components/input/Button.svelte";
   /** @type {import('./$types').PageData} */
   export let data;
   export let form;
@@ -50,12 +52,17 @@
     });
     socket.disconnect();
   }
+
+  let user = "";
 </script>
 
-<section class="flex flex-col gap-10">
-  <Index full_name="Login" />
+<section class="main flex flex-col gap-10">
+  <Index full_name="Login {user ? `as ${user}` : ''}" />
+  <div class="w-64 img_holder mx-auto rounded-lg overflow-hidden">
+    <img src="/login.jpeg" alt="login" class="w-full">
+  </div>
   <form class="flex flex-col gap-3" method="post" use:enhance>
-    <input
+    <!-- <input
       class="h-16 outline-none px-2 placeholder:text-gray-500 font-normal placeholder:text-2xl focus:placeholder:text-lg placeholder:transition-all bg-transparent border-b border-gray-600"
       type="text"
       id="user"
@@ -70,20 +77,33 @@
       id="password"
       name="password"
       required
+    /> -->
+    <Text
+      label="user"
+      placeholder="Username or Email"
+      getText={(val) => {
+        user = val;
+      }}
     />
+    <Text label="password" type="password" placeholder="Password" />
 
-    <p class="ms-auto">
+    <p class="ms-auto text-[#515751]">
       Don't have an account? <a class=" underline" href="/signup"
         >Register here</a
       >
     </p>
 
-    <button
+    <!-- <button
       class="text-xl font-semibold bg-black text-white w-fit block mx-auto px-24 py-5 rounded-lg mt-5"
       type="submit">Submit</button
+    > -->
+    <Button
+      className="block mx-auto transition-all"
+      >Submit</Button
     >
   </form>
 </section>
+
 
 <svelte:head>
   <title>Login</title>

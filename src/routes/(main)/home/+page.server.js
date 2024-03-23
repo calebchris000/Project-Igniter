@@ -36,6 +36,7 @@ export async function load({ cookies, depends, params }) {
       return {
         status: 401,
         message: error.message,
+        data: {},
         params: { userId: "", all_users: { data: [] }, connected: false },
       };
     }

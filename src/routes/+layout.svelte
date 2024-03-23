@@ -14,11 +14,13 @@
   const user = typeof window !== "undefined" && parseCookie("user");
 
   onMount(() => {
-    if (!user) {
-      const { pathname } = window.location;
+    const { pathname } = window.location;
 
+    if (!user) {
       if (pathname === "/login" || pathname === "/signup") return;
       window.location.replace("/login");
+    } else if (pathname === "/" && !!user) {
+      window.location.replace("/home");
     }
   });
 
@@ -28,7 +30,7 @@
       reason = c.notification.reason;
     });
 
-    if(reason === "disconnect") {
+    if (reason === "disconnect") {
       store.update((c) => {
         c.notification.reason = null;
         c.notification.show = true;
@@ -37,8 +39,7 @@
         c.notification.message = "Connection is back!";
         return c;
       });
-    }
-    else if(reason !== "logged_in") {
+    } else if (reason !== "logged_in") {
       store.update((c) => {
         c.notification.show = true;
         c.notification.status = "success";
@@ -85,7 +86,7 @@
   });
 </script>
 
-<main class="h-screen main bg-gray-100 relative p-6 max-w-[40rem] mx-auto">
+<main class="h-screen main bg-[#F5F9E9] relative p-6 max-w-[40rem] mx-auto">
   <Notification />
   <slot />
 </main>

@@ -48,17 +48,20 @@ export const actions = {
         return {
           status: error?.response?.status,
           message: error?.response?.data?.message,
+          data: {},
         };
       } else if (error.request) {
         return {
           status: 503,
           message:
             "Cannot connect to server. Are you connected to the internet?",
+          data: {},
         };
       }
       return {
         status: 500,
         message: error.message,
+        data: {},
       };
     }
   },

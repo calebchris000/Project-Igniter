@@ -1,0 +1,35 @@
+.chat-body {
+  height: calc(100vh - 16rem);
+}
+
+.chat-body::-webkit-scrollbar {
+  width: 0;
+}
+
+.you {
+  margin-left: auto;
+}
+
+.you .message {
+  background-color: rgb(37 99 235);
+}
+
+.recipient {
+  background-color: rgb(22 163 74);
+  font-style: normal;
+}
+
+.message {
+  /* margin-left: auto; */
+  margin: 0;
+}
+
+.you .message,
+.recipient {
+  border-radius: 0.75rem;
+  width: fit-content;
+  padding: 0.5rem 1rem;
+  color: white;
+  font-weight: 500;
+  max-width: 16rem;
+}

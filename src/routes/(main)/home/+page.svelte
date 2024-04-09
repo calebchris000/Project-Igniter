@@ -6,9 +6,31 @@
   import { initializeConnection, socket } from "../../../core/chat-core/index";
   import moment from "moment";
   import { onDestroy, onMount } from "svelte";
-  import { store } from "$lib/store";
+  import { store } from "../../../lib/store";
+  import Text from "../../../components/input/Text.svelte";
+  import Search from "../../../components/icons/Search.svelte";
   /** @type {import('./$types').PageData} */
   export let data;
+
+  $: if (data?.status === 401) {
+    typeof window !== undefined && window.location.replace("/login");
+  }
+
+  $: if (!data.params.connected) {
+    const cached_users = JSON.parse(localStorage.getItem("home"));
+    if (!cached_users) {
+      const { pathname } = window.location;
+      localStorage.setItem("last_route", JSON.stringify(pathname));
+      window.location.replace("/not-connected");
+    }
+    const make_all_inactive = cached_users?.data?.map((c) => {
+      return { ...c, status: "away" };
+    });
+    cached_users.data = make_all_inactive;
+    data = cached_users;
+  } else {
+    localStorage.setItem("home", JSON.stringify(data));
+  }
 
   onMount(() => {
     invalidate("api:users");
@@ -40,7 +62,7 @@
     })
     .filter((u) => u._id !== _data._id);
 
-  $: filtered = users.filter((u) => {
+  $: filtered = users?.filter((u) => {
     if (!search) return users;
     return (
       u.name.toLowerCase().trim().includes(search.toLowerCase()) ||
@@ -93,20 +115,13 @@
   let show_context_menu = false;
 </script>
 
-<main class="p-10 flex flex-col gap-14">
-  <NavBar {full_name} />
+<main class="flex flex-col gap-4">
+  <NavBar
+    full_name="Igniter"
+  />
   <div class="body flex flex-col gap-10">
-    <div>
-      <input
-        bind:value={search}
-        placeholder="Search"
-        class="bg-transparent placeholder:text-black placeholder:text-3xl focus:placeholder:text-lg placeholder:transition-all h-14 placeholder:opacity-70 transition-all focus:border-opacity-100 border-opacity-30 border-b border-black outline-none w-full"
-        type="text"
-      />
-    </div>
-
-    <div class="flex flex-col gap-4">
-      {#if users.length}
+    <div class="flex flex-col gap-4 mt-5">
+      {#if users && users.length}
         {#each filtered as { image, typing, own_id, sender_id, unread, _id: id, name, status, preview, receipt, message_time }}
           <Preview
             {image}

@@ -10,7 +10,7 @@ export async function load({ cookies, params, depends }) {
     const parsed = jwt.decode(token, secret);
     const own_id = parsed.id;
 
-    depends("api:userId")
+    depends("api:userId");
 
     const response = await axios.get(`${base_url}/v1/user/${userId}`, {
       headers: {
@@ -21,12 +21,13 @@ export async function load({ cookies, params, depends }) {
 
     if (response.status !== 200) {
       return {
-        error: _data?.message,
+        status: response.status,
+        message: _data?.message,
+        data: {},
         params: { own_id, recipientId: params.userId },
       };
     }
 
-    //TODO Messages endpoint
     const _response = await axios.get(
       `${base_url}/v1/messages/${own_id}/${userId}`,
       {
@@ -36,17 +37,29 @@ export async function load({ cookies, params, depends }) {
       }
     );
     const __data = _response.data;
-    
 
-    return {
-      user: _data.data,
+    const responseData = {
+      status: response.status,
       messages: __data.data,
-      params: { own_id, recipientId: params.userId },
+      data: _data.data,
+      params: {
+        own_id,
+        recipientId: params.userId,
+        connected: true,
+      },
     };
+
+    return responseData;
   } catch (error) {
     return {
-      error: String(error),
-      params: { own_id: "", recipientId: params.userId },
+      status: 500,
+      message: String(error),
+      data: {},
+      params: {
+        own_id: "",
+        recipientId: params.userId,
+        connected: false,
+      },
     };
   }
 }

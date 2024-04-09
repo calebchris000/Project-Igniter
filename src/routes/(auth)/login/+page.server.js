@@ -16,7 +16,11 @@ export const actions = {
       const data = { user, password };
       const base_url = import.meta.env.VITE_SERVER_BASE_URL;
 
-      const response = await axios.post(`${base_url}/v1/login`, data);
+      const response = await axios.post(`${base_url}/v1/login`, data, {
+        headers: {
+          'Access-Control-Allow-Origin': "*"
+        }
+      });
 
       const _data = response.data;
       const url = new URL(base_url);

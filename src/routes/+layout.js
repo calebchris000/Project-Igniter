@@ -6,8 +6,6 @@ export async function load({params, cookies}) {
         const base_url = import.meta.env.VITE_SERVER_BASE_URL;
         const response = await axios.get(base_url);
 
-        const token = cookies.get("token");
-        const secret = import.meta.env.VITE_JWT_SECRET;
 
         let data = response.data;
         if (response.status !== 200) {

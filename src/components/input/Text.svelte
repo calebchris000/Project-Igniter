@@ -1,7 +1,7 @@
 <script lang="ts">
   import Blank from "./../icons/Blank.svelte";
   import "./style.css";
-  export let className: string = ""
+  export let className: string = "";
   export let label = "";
   export let placeholder = "Placeholder";
   export let type = "text";
@@ -34,13 +34,19 @@
     name={label}
     id={label}
     {maxlength}
-    class="outline-none input p-6 {Icon && "px-16"} py-4 transition-all bg-transparent  text-[#36453b] font-medium placeholder:text-[#36453b] placeholder:font-medium border-b-2 border-[#36453b] {className}"
+    class="outline-none input p-6 {Icon &&
+      'px-16'} py-4 transition-all bg-transparent text-[#36453b] font-medium placeholder:text-[#36453b] placeholder:font-medium border-b-2 border-[#36453b] {className}"
     {placeholder}
     required={true}
   />
 
   {#if Icon}
-    <div class="absolute top-[50%] translate-y-[-50%] text-white {icon_position === "left" ? "left-5": "right-5"}">
+    <div
+      class="absolute top-[50%] translate-y-[-50%] text-white {icon_position ===
+      'left'
+        ? 'left-5'
+        : 'right-5'}"
+    >
       <Icon className="text-[#36453b] text-3xl" />
     </div>
   {/if}

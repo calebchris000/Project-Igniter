@@ -15,6 +15,7 @@ export async function load({ cookies, params, depends }) {
     const response = await axios.get(`${base_url}/v1/user/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
       },
     });
     const _data = response.data;
@@ -33,7 +34,8 @@ export async function load({ cookies, params, depends }) {
       {
         headers: {
           Authorization: `Bearer ${token}`,
-        },
+        "Content-Type": "application/json"
+      },
       }
     );
     const __data = _response.data;

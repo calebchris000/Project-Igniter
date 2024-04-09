@@ -10,6 +10,7 @@ export async function load({ cookies }) {
     const response = await axios.get(`${base_url}/v1/user`, {
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
       },
     });
 

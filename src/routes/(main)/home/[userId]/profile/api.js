@@ -9,7 +9,8 @@ export async function UpdateActions({ token, actions }) {
         {
           headers: {
             Authorization: `Bearer ${token}`,
-          },
+        "Content-Type": "application/json"
+      },
         }
       );
       const data = response.data;

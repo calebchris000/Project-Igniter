@@ -15,12 +15,20 @@ export const actions = {
       const fullName = form.get("fullName");
       const password = form.get("password");
 
-      const response = await axios.post(`${base_url}/v1/signup`, {
-        email,
-        password,
-        username,
-        fullName,
-      });
+      const response = await axios.post(
+        `${base_url}/v1/signup`,
+        {
+          email,
+          password,
+          username,
+          fullName,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       const data = response.data;
       return { ...data, status: response.status };

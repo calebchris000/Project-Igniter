@@ -4,7 +4,11 @@ import axios from "axios";
 export async function load({params, cookies}) {
     try {
         const base_url = import.meta.env.VITE_SERVER_BASE_URL;
-        const response = await axios.get(base_url);
+        const response = await axios.get(base_url, {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
 
 
         let data = response.data;

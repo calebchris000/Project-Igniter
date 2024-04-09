@@ -18,7 +18,8 @@ export const actions = {
 
       const response = await axios.post(`${base_url}/v1/login`, data, {
         headers: {
-          'Access-Control-Allow-Origin': "*"
+          'Access-Control-Allow-Origin': "",
+          "Content-Type": "application/json"
         }
       });
 

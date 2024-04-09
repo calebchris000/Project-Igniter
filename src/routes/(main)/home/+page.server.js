@@ -15,6 +15,7 @@ export async function load({ cookies, depends, params }) {
     const response = await axios.get(`${base_url}/v1/users/recent`, {
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
       },
     });
 
@@ -53,6 +54,7 @@ async function fetchAllUsers(data) {
     const response = await axios.get(`${base_url}/v1/users`, {
       headers: {
         Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
       },
     });
 

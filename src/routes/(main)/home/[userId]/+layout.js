@@ -14,6 +14,8 @@ export async function load({ cookies }) {
       },
     });
 
+    console.log("response",response)
+
     return {
       status: response.status,
       message: response.data?.message,

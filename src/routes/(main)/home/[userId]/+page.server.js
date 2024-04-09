@@ -21,7 +21,9 @@ export async function load({ cookies, params, depends }) {
 
     if (response.status !== 200) {
       return {
-        error: _data?.message,
+        status: response.status,
+        message: _data?.message,
+        data: {},
         params: { own_id, recipientId: params.userId },
       };
     }
@@ -37,8 +39,9 @@ export async function load({ cookies, params, depends }) {
     const __data = _response.data;
 
     const responseData = {
-      user: _data.data,
+      status: response.status,
       messages: __data.data,
+      data: _data.data,
       params: {
         own_id,
         recipientId: params.userId,
@@ -49,8 +52,9 @@ export async function load({ cookies, params, depends }) {
     return responseData;
   } catch (error) {
     return {
-      error: String(error),
-      messages: [],
+      status: 500,
+      message: String(error),
+      data: {},
       params: {
         own_id: "",
         recipientId: params.userId,

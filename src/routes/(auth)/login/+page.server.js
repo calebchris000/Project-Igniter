@@ -28,37 +28,31 @@ export const actions = {
         maxAge: 86400000,
       });
 
-      store.update((c) => {
-        c.notification.show = true;
-        c.notification.status = "success";
-        c.notification.title = "Success";
-        c.notification.message = "Login Successful";
-
-        return c;
-      });
-
       const { token, ...others } = _data.data;
       return {
         status: response.status,
         message: _data.message,
-        data: _data.data,
+        data: others,
       };
     } catch (error) {
       if (error.response) {
         return {
           status: error?.response?.status,
           message: error?.response?.data?.message,
+          data: {},
         };
       } else if (error.request) {
         return {
           status: 503,
           message:
             "Cannot connect to server. Are you connected to the internet?",
+          data: {},
         };
       }
       return {
         status: 500,
         message: error.message,
+        data: {},
       };
     }
   },

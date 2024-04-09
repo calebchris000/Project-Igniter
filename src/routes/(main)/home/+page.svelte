@@ -7,6 +7,8 @@
   import moment from "moment";
   import { onDestroy, onMount } from "svelte";
   import { store } from "../../../lib/store";
+  import Text from "../../../components/input/Text.svelte";
+  import Search from "../../../components/icons/Search.svelte";
   /** @type {import('./$types').PageData} */
   export let data;
 
@@ -113,19 +115,12 @@
   let show_context_menu = false;
 </script>
 
-<main class="p-10 flex flex-col gap-14">
-  <NavBar {full_name} />
+<main class="flex flex-col gap-4">
+  <NavBar
+    full_name="Igniter"
+  />
   <div class="body flex flex-col gap-10">
-    <div>
-      <input
-        bind:value={search}
-        placeholder="Search"
-        class="bg-transparent placeholder:text-black placeholder:text-3xl focus:placeholder:text-lg placeholder:transition-all h-14 placeholder:opacity-70 transition-all focus:border-opacity-100 border-opacity-30 border-b border-black outline-none w-full"
-        type="text"
-      />
-    </div>
-
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4 mt-5">
       {#if users && users.length}
         {#each filtered as { image, typing, own_id, sender_id, unread, _id: id, name, status, preview, receipt, message_time }}
           <Preview

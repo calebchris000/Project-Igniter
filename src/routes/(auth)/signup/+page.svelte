@@ -1,8 +1,16 @@
 <script>
+  import Profile from "./../../../components/icons/Profile.svelte";
   import { goto } from "$app/navigation";
   import Index from "../../../lib/top/index.svelte";
   import { enhance } from "$app/forms";
   import { store } from "../../../lib";
+  import Text from "../../../components/input/Text.svelte";
+  import Button from "../../../components/input/Button.svelte";
+  import Back from "../../../components/icons/Back.svelte";
+  import User from "../../../components/icons/User.svelte";
+  import Alias from "../../../components/icons/Alias.svelte";
+  import Email from "../../../components/icons/Email.svelte";
+  import Padlock from "../../../components/icons/Padlock.svelte";
 
   /** @type {import('./$types').PageData} */
   export let data;
@@ -12,68 +20,111 @@
     store.update((c) => {
       c.notification.show = true;
       c.notification.status = "success";
-      c.notification.title = "Signup Successful"
-      c.notification.message = "Account created"
+      c.notification.title = "Signup Successful";
+      c.notification.message = "Account created";
       return c;
     });
     goto("/login");
-  }
-  else if(form?.status && form.status !== 201) {
+  } else if (form?.status && form.status !== 201) {
     store.update((c) => {
       c.notification.show = true;
       c.notification.status = "error";
-      c.notification.title = "Signup Failed"
-      c.notification.message = form?.message
+      c.notification.title = "Signup Failed";
+      c.notification.message = form?.message;
       return c;
     });
+  }
+
+  $: password = "";
+  $: confirm_password = "";
+  $: password_error = "";
+
+  $: if (password.length && confirm_password.length) {
+    if (password !== confirm_password) {
+      password_error = "Password doesn't match.";
+    } else {
+      password_error = "";
+    }
   }
 </script>
 
 <section class="flex flex-col gap-10">
-  <Index full_name="Sign Up" />
+  <div class="flex flex-col gap-3 text-[#36453b]">
+    <Back className="mb-5 cursor-pointer" click={() => {
+      goto("/")
+    }} />
+    <p class="text-4xl font-bold">SIGN UP</p>
+  </div>
   <form class="flex flex-col gap-3" method="post" use:enhance>
-    <input
-      class="h-16 outline-none px-2 placeholder:text-gray-500 font-normal placeholder:text-2xl focus:placeholder:text-lg placeholder:transition-all bg-transparent border-b border-gray-600"
-      type="text"
-      id="username"
-      name="username"
+    <Text
+      Icon={Alias}
+      label="username"
+      icon_position="left"
       placeholder="Username"
-      required
+      getText={(val) => {
+        // user = val;
+      }}
+      className="w-full"
     />
-    <input
-      class="h-16 outline-none px-2 placeholder:text-gray-500 font-normal placeholder:text-2xl focus:placeholder:text-lg placeholder:transition-all bg-transparent border-b border-gray-600"
-      type="text"
-      id="email"
-      name="email"
-      placeholder="Email"
-      required
-    />
-    <input
-      class="h-16 outline-none px-2 placeholder:text-gray-500 font-normal placeholder:text-2xl focus:placeholder:text-lg placeholder:transition-all bg-transparent border-b border-gray-600"
-      type="text"
-      id="fullName"
-      name="fullName"
+    <Text
+      Icon={Alias}
+      label="fullName"
       placeholder="Full Name"
-      required
+      className="w-full"
+      getText={(val) => {
+        // user = val;
+      }}
     />
-    <input
-      class="h-16 outline-none px-2 placeholder:text-gray-500 font-normal placeholder:text-2xl focus:placeholder:text-lg placeholder:transition-all bg-transparent border-b border-gray-600"
-      type="password"
+    <Text
+      Icon={Email}
+      label="email"
+      placeholder="Email"
+      className="w-full"
+      getText={(val) => {
+        // user = val;
+      }}
+    />
+
+    <Text
+      Icon={Padlock}
+      label="password"
       placeholder="Password"
-      id="password"
-      name="password"
-      required
-      minlength="6"
+      className="w-full"
+      maxlength={6}
+      type="password"
+      getText={(val) => {
+        // user = val;
+        password = val;
+      }}
     />
+    <Text
+      Icon={Padlock}
+      label="confirm_password"
+      placeholder="Confirm Password"
+      maxlength={6}
+      className="w-full"
+      type="password"
+      getText={(val) => {
+        // user = val;
+        confirm_password = val;
+      }}
+    />
+    <div class="flex justify-between w-full">
+      <p
+        class="text-red-500 font-semibold transition-all"
+        style="opacity: {password_error.length ? '1' : '0'}"
+      >
+        {password_error}
+      </p>
 
-    <p class="ms-auto">
-      Already have an account? <a class="underline" href="/login">Login here</a>
-    </p>
+      <p class="my-3">
+        Already have an account? <a class="underline" href="/login"
+          >Login here</a
+        >
+      </p>
+    </div>
 
-    <button
-      class="text-xl font-semibold bg-black text-white w-fit block mx-auto px-24 py-5 rounded-lg mt-5"
-      type="submit">Submit</button
-    >
+    <Button className="block w-full rounded-xl font-semibold col-span-2 transition-all">Create Account</Button>
   </form>
 </section>
 
